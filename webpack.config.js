@@ -3,6 +3,7 @@ const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = (env, argv) => {
     return ({
@@ -79,6 +80,10 @@ module.exports = (env, argv) => {
                 template: 'src/index.ejs',
                 hash: true,
                 minify: false
+            }),
+
+            new CopyWebpackPlugin({
+                patterns: [{ from: "src/assets", to: "assets" }]
             })
         ]
     });
