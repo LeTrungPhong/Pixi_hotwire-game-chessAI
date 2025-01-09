@@ -6,8 +6,8 @@ const app = new Application<HTMLCanvasElement>({
     resolution: window.devicePixelRatio || 1,
     autoDensity: true,
     backgroundColor: "#fff",
-    width: 640,
-    height: 480
+    width: 960,
+    height: 450
 });
 
 const canvas = app.view;
@@ -20,3 +20,6 @@ sceny.x = 0;
 sceny.y = 0;
 
 app.stage.addChild(sceny);
+
+
+

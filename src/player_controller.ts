@@ -5,11 +5,11 @@ export class PlayerController extends Container {
     private postX?: number;
     private postY?: number;
 
-    constructor(screenWidth: number, screenHeight: number) {
+    constructor(postX: number, postY: number) {
         super();
 
-        this.postX = screenWidth / 2;
-        this.postY = screenHeight / 2;
+        this.postX = postX;
+        this.postY = postY;
     }
 
     public async loadImage(): Promise<void> {
@@ -27,6 +27,7 @@ export class PlayerController extends Container {
             this.addChild(this.spriteFrog);
 
             console.log("Tai anh player thanh cong");
+
         } catch (error) {
             console.error("Error loading image:", error);
         }
@@ -39,7 +40,6 @@ export class PlayerController extends Container {
 
             const angle = Math.atan2(dy, dx) - Math.PI / 2;
 
-            console.log(angle);
 
             // this.spriteFrog.rotation = (this.numberDeg * (180 / Math.PI)) || 0;
 
