@@ -1,6 +1,6 @@
 import Collider from "./collider_abstract";
 
-export default class CircleCollider extends Collider{
+export default class CircleCollider extends Collider {
     private radius?: number;
 
     constructor(x: number, y: number, radius: number) {

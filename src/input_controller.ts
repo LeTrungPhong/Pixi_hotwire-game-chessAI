@@ -1,3 +1,4 @@
+import ObstacleBulletManager from "./managers/obstacle_bullet_manager";
 import { PlayerController } from "./player_controller";
 
 export class InputController {
@@ -9,11 +10,19 @@ export class InputController {
     private rectY?: number;
 
     private playerController?: PlayerController;
+    private obstacleBulletManager?: ObstacleBulletManager;
 
-    constructor(rectX: number, rectY: number, playerController: PlayerController) {
+    constructor(rectX: number, rectY: number, playerController: PlayerController, obstacleBulletManager: ObstacleBulletManager) {
         this.rectX = rectX;
         this.rectY = rectY;
         this.playerController = playerController;
+        this.obstacleBulletManager = obstacleBulletManager;
+    }
+
+    public update(delta: number) {
+        this.obstacleBulletManager?.update(delta);
+
+        // console.log("Check")
     }
 
     public load() {
@@ -26,6 +35,10 @@ export class InputController {
             // this.mouseY = e.clientY - (this.rectY || 0);
 
             // this.sendMousePositionToServer(this.mouseX, this.mouseY);
+
+            this.mouseX = e.clientX - (this.rectX || 0);
+            this.mouseY = e.clientY - (this.rectY || 0);
+            this.obstacleBulletManager?.shot(this.mouseX, this.mouseY);
         });
         window.addEventListener('mouseup', (e) => this.buttons[e.button] = false);
         window.addEventListener('mousemove', (e) => {

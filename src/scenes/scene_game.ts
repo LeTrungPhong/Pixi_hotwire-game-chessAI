@@ -1,25 +1,34 @@
 import { Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
 import { InputController } from "../input_controller";
 import { PlayerController } from "../player_controller";
+import ObstacleBulletManager from "../managers/obstacle_bullet_manager";
+import { screenWidth, screenHeight } from "../common";
 
 export class Scene extends Container {
     private readonly screenWidth: number;
     private readonly screenHeight: number;
     private inputController?: InputController;
     private playerController?: PlayerController;
+    private obstacleBulletManager?: ObstacleBulletManager;
 
     private arrayLine: { x: number, y: number }[] = [];
     private numberObstacle?: number;
 
-    constructor(screenWidth: number, screenHeight: number, canvasX: number, canvasY: number) {
+    constructor(canvasX: number, canvasY: number) {
         super();
-
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
 
-        this.playerController = new PlayerController(this.screenWidth / 2, this.screenHeight / 2);
-        
-        this.inputController = new InputController(canvasX, canvasY, this.playerController);
+        const postX = this.screenWidth / 2;
+        const postY = this.screenHeight / 2;
+
+        this.playerController = new PlayerController(postX, postY);
+        this.obstacleBulletManager = new ObstacleBulletManager(postX, postY);
+
+        // console.log(`screenWidth: ${screenWidth}, screenHeight: ${screenHeight}`);
+        // console.log(this.obstacleBulletManager.x + " " + this.obstacleBulletManager.y)
+
+        this.inputController = new InputController(canvasX, canvasY, this.playerController, this.obstacleBulletManager);
         this.inputController.load();
         
         this.sortableChildren = true;
@@ -36,8 +45,11 @@ export class Scene extends Container {
         // this.addChild(newGraphics);
         this.initialize();
         this.addChild(this.playerController);
+        this.addChild(this.obstacleBulletManager);
 
-        // this.update();
+        
+
+        // this.loadData();
     }
 
     private async initialize() {
@@ -46,7 +58,7 @@ export class Scene extends Container {
             const backgroundSprite: Sprite = new Sprite(background);
             backgroundSprite.x = 0;
             backgroundSprite.y = 0;
-            this.addChildAt(backgroundSprite, 0);
+            // this.addChildAt(backgroundSprite, 0);
 
             await this.playerController?.loadImage();
 
@@ -57,6 +69,11 @@ export class Scene extends Container {
         } catch (error) {
             console.error("Error loading player" + error);
         }
+    }
+
+    public update(delta: number) {
+        this.inputController?.update(delta);
+        // console.log("Check")
     }
 
     private processLevelData(data: any) {
@@ -94,7 +111,7 @@ export class Scene extends Container {
         this.arrayLine.push({ x, y });
     }
 
-    private async update() {
+    private async loadData() {
         try {
             const response = await fetch("assets/levels/level_1.json");
             const level = await response.json();
@@ -103,6 +120,6 @@ export class Scene extends Container {
             console.error("Error fetching level data: " + error);
         }
 
-        requestAnimationFrame(() => this.update());
+        requestAnimationFrame(() => this.loadData());
     }
 }
