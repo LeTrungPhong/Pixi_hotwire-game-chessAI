@@ -49,11 +49,10 @@ export default class ObstacleBulletManager extends Container {
     public addNewBullet(): void {
         const newObstacle = this.createNewBullet();
         this.listBullet?.push(newObstacle);
-        this.addChild(newObstacle);
+        this.addChildAt(newObstacle, 0);
     }
 
     public shot(mouseX: number, mouseY: number): void {
-        console.log(this.listBullet.length);
 
         if (this.listBullet.length > 0 && this.timeSpace > 0.2) {
             const vectorDirect = { x: mouseX - this.postX, y: mouseY - this.postY };
@@ -71,9 +70,9 @@ export default class ObstacleBulletManager extends Container {
                     break;
                 }
             }
-            console.log("Obstacle velocity set to 30");
+            // console.log("Obstacle velocity set to 30");
         } else {
-            console.log("No obstacles in listBullet");
+            // console.log("No obstacles in listBullet");
         }
     }
 }

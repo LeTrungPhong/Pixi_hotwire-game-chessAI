@@ -34,7 +34,6 @@ export class Obstacle extends Graphics {
         this.endFill();
 
         this.collider = new CircleCollider(this.x, this.y, radius);
-
     }
 
     public update(delta: number): void {
@@ -49,9 +48,9 @@ export class Obstacle extends Graphics {
             }
         }
 
-        this.x = (this.x || 0) + (this.vx || 0) * delta;
-        this.y = (this.y || 0) + (this.vy || 0) * delta;
-        this.collider?.setX((this.x || 0) + (this.vx || 0) * delta);
-        this.collider?.setY((this.y || 0) + (this.vy || 0) * delta);
+        this.x = this.x + this.vx * delta;
+        this.y = this.y + this.vy * delta;
+        this.collider.x = this.x;
+        this.collider.y = this.y;
     }
 }

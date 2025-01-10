@@ -3,6 +3,7 @@ import { InputController } from "../input_controller";
 import { PlayerController } from "../player_controller";
 import ObstacleBulletManager from "../managers/obstacle_bullet_manager";
 import { screenWidth, screenHeight } from "../common";
+import ObstacleMoveManager from "../managers/obstacle_move_manager";
 
 export class Scene extends Container {
     private readonly screenWidth: number;
@@ -10,26 +11,19 @@ export class Scene extends Container {
     private inputController?: InputController;
     private playerController?: PlayerController;
     private obstacleBulletManager?: ObstacleBulletManager;
+    private obstacleMoveManager?: ObstacleMoveManager;
 
     private arrayLine: { x: number, y: number }[] = [];
-    private numberObstacle?: number;
+    // private numberObstacle?: number;
 
     constructor(canvasX: number, canvasY: number) {
         super();
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
 
-        const postX = this.screenWidth / 2;
-        const postY = this.screenHeight / 2;
-
-        this.playerController = new PlayerController(postX, postY);
-        this.obstacleBulletManager = new ObstacleBulletManager(postX, postY);
-
-        // console.log(`screenWidth: ${screenWidth}, screenHeight: ${screenHeight}`);
-        // console.log(this.obstacleBulletManager.x + " " + this.obstacleBulletManager.y)
-
-        this.inputController = new InputController(canvasX, canvasY, this.playerController, this.obstacleBulletManager);
-        this.inputController.load();
+        
+        this.initialize(canvasX, canvasY);
+        // console.log(this.arrayLine)
         
         this.sortableChildren = true;
         
@@ -43,16 +37,14 @@ export class Scene extends Container {
         // newGraphics.endFill();
 
         // this.addChild(newGraphics);
-        this.initialize();
-        this.addChild(this.playerController);
-        this.addChild(this.obstacleBulletManager);
+        
 
         
 
         // this.loadData();
     }
 
-    private async initialize() {
+    private async initialize(canvasX: number, canvasY: number) {
         try {
             const background: Texture = await Assets.load("assets/images/background.jpg");
             const backgroundSprite: Sprite = new Sprite(background);
@@ -65,6 +57,22 @@ export class Scene extends Container {
             const response = await fetch("assets/levels/level_1.json");
             const level = await response.json();
             this.processLevelData(level);
+
+            const postX = this.screenWidth / 2;
+            const postY = this.screenHeight / 2;
+
+            this.playerController = new PlayerController(postX, postY);
+            this.playerController.loadImage();
+            this.obstacleBulletManager = new ObstacleBulletManager(postX, postY);
+
+            this.obstacleMoveManager = new ObstacleMoveManager(20 ,this.arrayLine);
+
+            this.inputController = new InputController(canvasX, canvasY, this.playerController, this.obstacleBulletManager, this.obstacleMoveManager);
+            this.inputController.load();
+
+            this.addChild(this.playerController);
+            this.addChild(this.obstacleBulletManager);
+            this.addChild(this.obstacleMoveManager);
 
         } catch (error) {
             console.error("Error loading player" + error);
@@ -80,16 +88,15 @@ export class Scene extends Container {
         var postLast = { x: 0, y: 0 };
 
         if (data) {
-            this.numberObstacle = data.number_of_obstacle;
-            console.log(`Number of obstacle: ${this.numberObstacle}`);
+            // this.numberObstacle = data.number_of_obstacle;
 
             if (data.line) {
                 data.line.forEach((point: { x: number, y: number }) => {
-                    const graphics = new Graphics();
-                    graphics.beginFill(0xFF00FF);
-                    graphics.drawCircle(point.x, point.y, 5);
-                    graphics.endFill();
-                    this.addChild(graphics);
+                    // const graphics = new Graphics();
+                    // graphics.beginFill(0xFF00FF);
+                    // graphics.drawCircle(point.x, point.y, 5);
+                    // graphics.endFill();
+                    // this.addChild(graphics);
     
                     if (postLast.x !== 0 && postLast.y !== 0) {
                         const graphicsLine = new Graphics();
