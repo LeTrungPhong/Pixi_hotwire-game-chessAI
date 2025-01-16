@@ -1,4 +1,4 @@
-import { Container, Texture } from "pixi.js";
+import { Application, Container, Texture } from "pixi.js";
 import BoardScene from "../scenes/board_scene";
 import { widthBoard } from "../common";
 import Knight from "../models/knight_piece";
@@ -9,13 +9,13 @@ import Queen from "../models/queen_piece";
 import Rook from "../models/rook_piece";
 import PieceManager from "./piece_manager";
 import StateManager from "./state_manager";
+import InputController from "./input_controller";
 
 export default class GameManager extends Container {
     private scaleScene: number;
     private boardScene: BoardScene;
-    
 
-    constructor(textures: { name: string, src: Texture}[]) {
+    constructor(textures: { name: string, src: Texture}[], app: Application<HTMLCanvasElement>) {
         super();
 
         const textureBoard = textures.find(asset => asset.name === 'bouncing')?.src;
@@ -116,6 +116,7 @@ export default class GameManager extends Container {
         pieceManager.addPiece(blackBishop_1);
         pieceManager.addPiece(blackBishop_2);
         pieceManager.addPiece(blackKnight_1);
+        pieceManager.addPiece(blackKnight_2);
         pieceManager.addPiece(blackPawn_1);
         pieceManager.addPiece(blackPawn_2);
         pieceManager.addPiece(blackPawn_3);
@@ -130,42 +131,11 @@ export default class GameManager extends Container {
 
         // add to ui
         this.addChild(this.boardScene);
-        this.addChild(whiteKing);
-        this.addChild(whiteBishop_1);
-        this.addChild(whiteBishop_2);
-        this.addChild(whiteKnight_1);
-        this.addChild(whiteKnight_2);
-        this.addChild(whitePawn_1);
-        this.addChild(whitePawn_2);
-        this.addChild(whitePawn_3);
-        this.addChild(whitePawn_4);
-        this.addChild(whitePawn_5);
-        this.addChild(whitePawn_6);
-        this.addChild(whitePawn_7);
-        this.addChild(whitePawn_8);
-        this.addChild(whiteQueen);
-        this.addChild(whiteKnight_1);
-        this.addChild(whiteKnight_2);
-        this.addChild(whiteRook_1);
-        this.addChild(whiteRook_2);
+        this.addChild(pieceManager)
 
-        this.addChild(blackKing);
-        this.addChild(blackBishop_1);
-        this.addChild(blackBishop_2);
-        this.addChild(blackKnight_1);
-        this.addChild(blackKnight_2);
-        this.addChild(blackPawn_1);
-        this.addChild(blackPawn_2);
-        this.addChild(blackPawn_3);
-        this.addChild(blackPawn_4);
-        this.addChild(blackPawn_5);
-        this.addChild(blackPawn_6);
-        this.addChild(blackPawn_7);
-        this.addChild(blackPawn_8);
-        this.addChild(blackQueen);
-        this.addChild(blackRook_1);
-        this.addChild(blackRook_2);
-
+        const inputController = new InputController(this.scaleScene, app);
+        inputController.load();
+        this.addChild(inputController);
     }
 
     public initialize() {

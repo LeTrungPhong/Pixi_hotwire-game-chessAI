@@ -6,3 +6,5 @@ export default class King extends Piece {
         super(name, value, moved, scaleScene, texture);
     }
 }
+
+// phong

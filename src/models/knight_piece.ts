@@ -6,3 +6,5 @@ export default class Knight extends Piece {
         super(name, value, moved, scaleScene, texture);
     }
 }
+
+// hoang

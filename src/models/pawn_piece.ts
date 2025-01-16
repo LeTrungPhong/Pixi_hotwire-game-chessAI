@@ -6,3 +6,5 @@ export default class Pawn extends Piece {
         super(name, value, moved, scaleScene, texture);
     }
 }
+
+// hoang

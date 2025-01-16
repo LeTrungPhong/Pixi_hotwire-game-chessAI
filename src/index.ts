@@ -1,5 +1,4 @@
 import { Application, Assets } from "pixi.js";
-import { screenWidth, screenHeight } from "./zuma/common";
 import GameManager from "./managers/game_manager";
 import { heightBoard, widthBoard } from "./common";
 
@@ -8,8 +7,8 @@ const app = new Application<HTMLCanvasElement>({
     resolution: window.devicePixelRatio || 1,
     autoDensity: true,
     backgroundColor: "#fff",
-    width: screenWidth,
-    height: screenHeight
+    width: 1000,
+    height: 1000
 });
 
 // const canvas = app.view;
@@ -52,7 +51,7 @@ async function loadAssets() {
         app.renderer.resize(widthBoard, heightBoard);
 
 
-        app.stage.addChild(new GameManager(textures));
+        app.stage.addChild(new GameManager(textures, app));
     } catch (error) {
         console.error('Lỗi khi tải ảnh:', error);
     }

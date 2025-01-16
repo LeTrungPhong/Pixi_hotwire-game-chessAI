@@ -1,9 +1,10 @@
+import { Graphics } from "pixi.js";
 import { borderBoard, widthBoard } from "../common";
 import Piece from "../models/piece_abstract";
 
 export default class StateManager {
     private static instance: StateManager;
-    private boardState: { post: { x: number, y: number, name: string }, piece: Piece | null }[][];
+    public boardState: { post: { x: number, y: number, name: string }, piece: Piece | null, focus: Graphics | null }[][];
 
     constructor() {
         const widthItem = (widthBoard - borderBoard * 2) / 8;
@@ -12,9 +13,16 @@ export default class StateManager {
             Array.from({ length: 8 }, (_, col) => ({
                 post: { x: col * widthItem + borderBoard + widthItem / 2, y: row * widthItem + borderBoard + widthItem / 2, name: `${String.fromCharCode(97 + col)}${8 - row}` },
                 piece: null,
+                focus: null
             }))
         );
     }
+
+    
+    // func lay danh sách bên trắng, bên đen (turn) => quân cờ // trung
+    // minimax // phong, duc, trung
+    // func gia lap (board state, quan co dang xet) => danh sach ban co moi // trung
+    // func cap nhat lai trang thai (board state)
 
     public addState(row: number, column: number, piece: Piece) {
         this.boardState[row][column].piece = piece;
@@ -44,7 +52,6 @@ export default class StateManager {
                     item.piece.y = item.post.y;
                 }
 
-                console.log(item.post.x)
             })
         })
     }

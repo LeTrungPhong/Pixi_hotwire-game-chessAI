@@ -6,3 +6,5 @@ export default class Rook extends Piece {
         super(name, value, moved, scaleScene, texture);
     }
 }
+
+// duc

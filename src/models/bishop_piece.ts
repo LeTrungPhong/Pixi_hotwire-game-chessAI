@@ -6,3 +6,5 @@ export default class Bishop extends Piece {
         super(name, value, moved, scaleScene, texture);
     }
 }
+
+// trung

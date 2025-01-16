@@ -6,3 +6,5 @@ export default class Queen extends Piece {
         super(name, value, moved, scaleScene, texture);
     }
 }
+
+// duc
