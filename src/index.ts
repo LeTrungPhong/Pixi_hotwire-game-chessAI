@@ -29,12 +29,12 @@ const assets = [
     { name: 'white-knight', path: 'assets/images/white-knight.png' },
     { name: 'white-king', path: 'assets/images/white-king.png' },
     { name: 'white-bishop', path: 'assets/images/white-bishop.png' },
-    { name: 'black-rook', path: 'assets/images/white-rook.png' },
-    { name: 'black-queen', path: 'assets/images/white-queen.png' },
-    { name: 'black-pawn', path: 'assets/images/white-pawn.png' },
-    { name: 'black-knight', path: 'assets/images/white-knight.png' },
-    { name: 'black-king', path: 'assets/images/white-king.png' },
-    { name: 'black-bishop', path: 'assets/images/white-bishop.png' }
+    { name: 'black-rook', path: 'assets/images/black-rook.png' },
+    { name: 'black-queen', path: 'assets/images/black-queen.png' },
+    { name: 'black-pawn', path: 'assets/images/black-pawn.png' },
+    { name: 'black-knight', path: 'assets/images/black-knight.png' },
+    { name: 'black-king', path: 'assets/images/black-king.png' },
+    { name: 'black-bishop', path: 'assets/images/black-bishop.png' }
 ]
 
 async function loadAssets() {

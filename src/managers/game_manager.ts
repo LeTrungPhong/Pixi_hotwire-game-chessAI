@@ -1,7 +1,6 @@
 import { Container, Texture } from "pixi.js";
 import BoardScene from "../scenes/board_scene";
 import { widthBoard } from "../common";
-import Piece from "../models/piece_abstract";
 import Knight from "../models/knight_piece";
 import King from "../models/king_piece";
 import Bishop from "../models/bishop_piece";
@@ -9,72 +8,167 @@ import Pawn from "../models/pawn_piece";
 import Queen from "../models/queen_piece";
 import Rook from "../models/rook_piece";
 import PieceManager from "./piece_manager";
+import StateManager from "./state_manager";
 
 export default class GameManager extends Container {
     private scaleScene: number;
     private boardScene: BoardScene;
-    private boardState: { post: { x: number, y: number, name: string }, piece: Piece }[][] = Array.from({ length: 8 }, () => Array(8).fill(0));
+    
 
     constructor(textures: { name: string, src: Texture}[]) {
         super();
-
-        //
-
-        //
 
         const textureBoard = textures.find(asset => asset.name === 'bouncing')?.src;
         this.scaleScene = widthBoard / (textureBoard?.width || 0);
         this.boardScene = new BoardScene(textureBoard);
 
         const whiteKing = new King("white_king", 900, false, this.scaleScene, textures.find(assets => assets.name === 'white-king')?.src);
-        const whiteBishop = new Bishop("white_bishop", 30, false, this.scaleScene, textures.find(assets => assets.name === 'white-bishop')?.src);
-        const whiteKnight = new Knight("white_knight", 30, false, this.scaleScene, textures.find(assets => assets.name === 'white-knight')?.src);
-        const whitePawn = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
+        const whiteBishop_1 = new Bishop("white_bishop", 35, false, this.scaleScene, textures.find(assets => assets.name === 'white-bishop')?.src);
+        const whiteBishop_2 = new Bishop("white_bishop", 35, false, this.scaleScene, textures.find(assets => assets.name === 'white-bishop')?.src);
+        const whiteKnight_1 = new Knight("white_knight", 30, false, this.scaleScene, textures.find(assets => assets.name === 'white-knight')?.src);
+        const whiteKnight_2 = new Knight("white_knight", 30, false, this.scaleScene, textures.find(assets => assets.name === 'white-knight')?.src);
+        const whitePawn_1 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
+        const whitePawn_2 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
+        const whitePawn_3 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
+        const whitePawn_4 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
+        const whitePawn_5 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
+        const whitePawn_6 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
+        const whitePawn_7 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
+        const whitePawn_8 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
         const whiteQueen = new Queen("white_queen", 90, false, this.scaleScene, textures.find(assets => assets.name === 'white-queen')?.src);
-        const whiteRook = new Rook("white_rook", 50, false, this.scaleScene, textures.find(assets => assets.name === 'white-rook')?.src);
+        const whiteRook_1 = new Rook("white_rook", 50, false, this.scaleScene, textures.find(assets => assets.name === 'white-rook')?.src);
+        const whiteRook_2 = new Rook("white_rook", 50, false, this.scaleScene, textures.find(assets => assets.name === 'white-rook')?.src);
 
         const blackKing = new King("black_king", -900, false, this.scaleScene, textures.find(assets => assets.name === 'black-king')?.src);
-        const blackBishop = new Bishop("black_bishop", -30, false, this.scaleScene, textures.find(assets => assets.name === 'black-bishop')?.src);
-        const blackKnight = new Knight("black_knight", -30, false, this.scaleScene, textures.find(assets => assets.name === 'black-knight')?.src);
-        const blackPawn = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
+        const blackBishop_1 = new Bishop("black_bishop", -35, false, this.scaleScene, textures.find(assets => assets.name === 'black-bishop')?.src);
+        const blackBishop_2 = new Bishop("black_bishop", -35, false, this.scaleScene, textures.find(assets => assets.name === 'black-bishop')?.src);
+        const blackKnight_1 = new Knight("black_knight", -30, false, this.scaleScene, textures.find(assets => assets.name === 'black-knight')?.src);
+        const blackKnight_2 = new Knight("black_knight", -30, false, this.scaleScene, textures.find(assets => assets.name === 'black-knight')?.src);
+        const blackPawn_1 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
+        const blackPawn_2 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
+        const blackPawn_3 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
+        const blackPawn_4 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
+        const blackPawn_5 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
+        const blackPawn_6 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
+        const blackPawn_7 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
+        const blackPawn_8 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
         const blackQueen = new Queen("black_queen", -90, false, this.scaleScene, textures.find(assets => assets.name === 'black-queen')?.src);
-        const blackRook = new Rook("black_rook", -50, false, this.scaleScene, textures.find(assets => assets.name === 'black-rook')?.src);
+        const blackRook_1 = new Rook("black_rook", -50, false, this.scaleScene, textures.find(assets => assets.name === 'black-rook')?.src);
+        const blackRook_2 = new Rook("black_rook", -50, false, this.scaleScene, textures.find(assets => assets.name === 'black-rook')?.src);
+
+        // create stateManager()
+        const stateManager = StateManager.getInstance();
+        stateManager.addState(0, 0, blackRook_1);
+        stateManager.addState(0, 1, blackKnight_1);
+        stateManager.addState(0, 2, blackBishop_1);
+        stateManager.addState(0, 3, blackQueen);
+        stateManager.addState(0, 4, blackKing);
+        stateManager.addState(0, 5, blackBishop_2);
+        stateManager.addState(0, 6, blackKnight_2);
+        stateManager.addState(0, 7, blackRook_2);
+        stateManager.addState(1, 0, blackPawn_1);
+        stateManager.addState(1, 1, blackPawn_2);
+        stateManager.addState(1, 2, blackPawn_3);
+        stateManager.addState(1, 3, blackPawn_4);
+        stateManager.addState(1, 4, blackPawn_5);
+        stateManager.addState(1, 5, blackPawn_6);
+        stateManager.addState(1, 6, blackPawn_7);
+        stateManager.addState(1, 7, blackPawn_8);
+
+        stateManager.addState(6, 0, whitePawn_1);
+        stateManager.addState(6, 1, whitePawn_2);
+        stateManager.addState(6, 2, whitePawn_3);
+        stateManager.addState(6, 3, whitePawn_4);
+        stateManager.addState(6, 4, whitePawn_5);
+        stateManager.addState(6, 5, whitePawn_6);
+        stateManager.addState(6, 6, whitePawn_7);
+        stateManager.addState(6, 7, whitePawn_8);
+        stateManager.addState(7, 0, whiteRook_1);
+        stateManager.addState(7, 1, whiteKnight_1);
+        stateManager.addState(7, 2, whiteBishop_1);
+        stateManager.addState(7, 3, whiteQueen);
+        stateManager.addState(7, 4, whiteKing);
+        stateManager.addState(7, 5, whiteBishop_2);
+        stateManager.addState(7, 6, whiteKnight_2);
+        stateManager.addState(7, 7, whiteRook_2);
+        stateManager.setPost();
  
+        // create pieceManager()
         const pieceManager = PieceManager.getInstance();
         pieceManager.addPiece(whiteKing);
-        pieceManager.addPiece(whiteBishop);
-        pieceManager.addPiece(whiteKnight);
-        pieceManager.addPiece(whitePawn);
+        pieceManager.addPiece(whiteBishop_1);
+        pieceManager.addPiece(whiteBishop_2);
+        pieceManager.addPiece(whiteKnight_1);
+        pieceManager.addPiece(whiteKnight_2);
+        pieceManager.addPiece(whitePawn_1);
+        pieceManager.addPiece(whitePawn_2);
+        pieceManager.addPiece(whitePawn_3);
+        pieceManager.addPiece(whitePawn_4);
+        pieceManager.addPiece(whitePawn_5);
+        pieceManager.addPiece(whitePawn_6);
+        pieceManager.addPiece(whitePawn_7);
+        pieceManager.addPiece(whitePawn_8);
         pieceManager.addPiece(whiteQueen);
-        pieceManager.addPiece(whiteKnight);
-        pieceManager.addPiece(whiteRook);
+        pieceManager.addPiece(whiteRook_1);
+        pieceManager.addPiece(whiteRook_2);
+
         pieceManager.addPiece(blackKing);
-        pieceManager.addPiece(blackBishop);
-        pieceManager.addPiece(blackKnight);
-        pieceManager.addPiece(blackPawn);
+        pieceManager.addPiece(blackBishop_1);
+        pieceManager.addPiece(blackBishop_2);
+        pieceManager.addPiece(blackKnight_1);
+        pieceManager.addPiece(blackPawn_1);
+        pieceManager.addPiece(blackPawn_2);
+        pieceManager.addPiece(blackPawn_3);
+        pieceManager.addPiece(blackPawn_4);
+        pieceManager.addPiece(blackPawn_5);
+        pieceManager.addPiece(blackPawn_6);
+        pieceManager.addPiece(blackPawn_7);
+        pieceManager.addPiece(blackPawn_8);
         pieceManager.addPiece(blackQueen);
-        pieceManager.addPiece(blackRook);
+        pieceManager.addPiece(blackRook_1);
+        pieceManager.addPiece(blackRook_2);
 
-        // this.boardState.forEach(());
-
+        // add to ui
         this.addChild(this.boardScene);
-        this.addChild(whiteKing)
-        this.addChild(whiteBishop)
-        this.addChild(whiteKnight)
-        this.addChild(whitePawn)
-        this.addChild(whiteQueen)
-        this.addChild(whiteKnight)
-        this.addChild(whiteRook)
-        this.addChild(blackKing)
-        this.addChild(blackBishop)
-        this.addChild(blackKnight)
-        this.addChild(blackPawn)
-        this.addChild(blackQueen)
-        this.addChild(blackRook)
+        this.addChild(whiteKing);
+        this.addChild(whiteBishop_1);
+        this.addChild(whiteBishop_2);
+        this.addChild(whiteKnight_1);
+        this.addChild(whiteKnight_2);
+        this.addChild(whitePawn_1);
+        this.addChild(whitePawn_2);
+        this.addChild(whitePawn_3);
+        this.addChild(whitePawn_4);
+        this.addChild(whitePawn_5);
+        this.addChild(whitePawn_6);
+        this.addChild(whitePawn_7);
+        this.addChild(whitePawn_8);
+        this.addChild(whiteQueen);
+        this.addChild(whiteKnight_1);
+        this.addChild(whiteKnight_2);
+        this.addChild(whiteRook_1);
+        this.addChild(whiteRook_2);
+
+        this.addChild(blackKing);
+        this.addChild(blackBishop_1);
+        this.addChild(blackBishop_2);
+        this.addChild(blackKnight_1);
+        this.addChild(blackKnight_2);
+        this.addChild(blackPawn_1);
+        this.addChild(blackPawn_2);
+        this.addChild(blackPawn_3);
+        this.addChild(blackPawn_4);
+        this.addChild(blackPawn_5);
+        this.addChild(blackPawn_6);
+        this.addChild(blackPawn_7);
+        this.addChild(blackPawn_8);
+        this.addChild(blackQueen);
+        this.addChild(blackRook_1);
+        this.addChild(blackRook_2);
+
     }
 
     public initialize() {
         this.scaleScene
-        this.boardState
     }
 }
