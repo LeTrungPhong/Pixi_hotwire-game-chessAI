@@ -1,8 +1,8 @@
 import { Container } from "pixi.js";
-import { Obstacle } from "../models/obstacle";
+import { Obstacle } from "./obstacle";
 
 export default class ObstacleBulletManager extends Container {
-    private listBullet: Obstacle[] = [];
+    public listBullet: Obstacle[] = [];
     private postX: number;
     private postY: number;
     private timeSpace: number = 0;
@@ -40,7 +40,7 @@ export default class ObstacleBulletManager extends Container {
 
     public createNewBullet(): Obstacle {
         const randomNumber = Math.floor(Math.random() * 7);
-        const newObstacle = new Obstacle(0, 0, 20, randomNumber);
+        const newObstacle = new Obstacle(0, 0, 20, randomNumber, "bullet");
         newObstacle.x = this.postX;
         newObstacle.y = this.postY;
         return newObstacle;

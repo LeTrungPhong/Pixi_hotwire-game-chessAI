@@ -1,9 +1,9 @@
 import { Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
-import { InputController } from "../input_controller";
-import { PlayerController } from "../player_controller";
-import ObstacleBulletManager from "../managers/obstacle_bullet_manager";
-import { screenWidth, screenHeight } from "../common";
-import ObstacleMoveManager from "../managers/obstacle_move_manager";
+import { InputController } from "./input_controller";
+import { PlayerController } from "./player_controller";
+import ObstacleBulletManager from "./obstacle_bullet_manager";
+import { screenWidth, screenHeight } from "./common";
+import ObstacleMoveManager from "./obstacle_move_manager";
 
 export class Scene extends Container {
     private readonly screenWidth: number;
@@ -36,10 +36,7 @@ export class Scene extends Container {
         // newGraphics.drawCircle(0, 0, 25); 
         // newGraphics.endFill();
 
-        // this.addChild(newGraphics);
-        
-
-        
+        // this.addChild(newGraphics); 
 
         // this.loadData();
     }
@@ -64,7 +61,6 @@ export class Scene extends Container {
             this.playerController = new PlayerController(postX, postY);
             this.playerController.loadImage();
             this.obstacleBulletManager = new ObstacleBulletManager(postX, postY);
-
             this.obstacleMoveManager = new ObstacleMoveManager(20 ,this.arrayLine);
 
             this.inputController = new InputController(canvasX, canvasY, this.playerController, this.obstacleBulletManager, this.obstacleMoveManager);
@@ -73,7 +69,6 @@ export class Scene extends Container {
             this.addChild(this.playerController);
             this.addChild(this.obstacleBulletManager);
             this.addChild(this.obstacleMoveManager);
-
         } catch (error) {
             console.error("Error loading player" + error);
         }

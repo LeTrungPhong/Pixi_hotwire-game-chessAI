@@ -19,3 +19,7 @@
 . Sound
 . Preloading assets
 . Promises
+. Hierarchy
+. Texture
+. Events Systems (Event emiter3)
+. UI

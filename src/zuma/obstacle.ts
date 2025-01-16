@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
 import CircleCollider from "../collision/circle_collider";
 import Collider from "../collision/collider_abstract";
-import { screenWidth, screenHeight } from "../common";
+import { screenWidth, screenHeight } from "./common";
 
 export class Obstacle extends Graphics {
     public vx: number;
@@ -10,12 +10,14 @@ export class Obstacle extends Graphics {
     public color: number;
     public collider: Collider;
     public checkState: boolean = true;
+    public type: string;
 
-    constructor(vx: number, vy: number, radius: number, color: number) {
+    constructor(vx: number, vy: number, radius: number, color: number, type: string) {
         super();
         this.vx = vx;
         this.vy = vy;
         this.radius = radius;
+        this.type = type;
 
         const pastColor = [
             "0xFF0000",

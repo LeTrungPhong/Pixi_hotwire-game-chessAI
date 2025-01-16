@@ -14,7 +14,7 @@ export default class CircleCollider extends Collider {
             const dx = this.x - other.x;
             const dy = this.y - other.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            console.log(this.x + " " + other.x)
+            // console.log(this.x + " " + other.x)
             return distance < (this.radius + other.radius);
         }
         return false;

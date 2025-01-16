@@ -1,5 +1,6 @@
-import ObstacleBulletManager from "./managers/obstacle_bullet_manager";
-import ObstacleMoveManager from "./managers/obstacle_move_manager";
+import ObstacleBulletManager from "./obstacle_bullet_manager"
+import ObstacelManager from "./obstacle_manager";
+import ObstacleMoveManager from "./obstacle_move_manager";
 import { PlayerController } from "./player_controller";
 
 export class InputController {
@@ -10,9 +11,10 @@ export class InputController {
     private rectX?: number;
     private rectY?: number;
 
-    private playerController?: PlayerController;
-    private obstacleBulletManager?: ObstacleBulletManager;
-    private obstacleMoveManager?: ObstacleMoveManager;
+    private playerController: PlayerController;
+    private obstacleBulletManager: ObstacleBulletManager;
+    private obstacleMoveManager: ObstacleMoveManager;
+    private obstacleManager: ObstacelManager;
 
     constructor(rectX: number, rectY: number, playerController: PlayerController, obstacleBulletManager: ObstacleBulletManager, obstacleMoveManager: ObstacleMoveManager) {
         this.rectX = rectX;
@@ -20,11 +22,13 @@ export class InputController {
         this.playerController = playerController;
         this.obstacleBulletManager = obstacleBulletManager;
         this.obstacleMoveManager = obstacleMoveManager;
+        this.obstacleManager = new ObstacelManager(this.obstacleBulletManager, this.obstacleMoveManager);
     }
 
     public update(delta: number) {
-        this.obstacleBulletManager?.update(delta);
-        this.obstacleMoveManager?.update(delta);
+        this.obstacleBulletManager.update(delta);
+        this.obstacleMoveManager.update(delta);
+        this.obstacleManager.update(delta);
     }
 
     public load() {

@@ -1,0 +1,11 @@
+{
+    "frames": {
+      "frame1": { "frame": { "x": 0, "y": 0, "w": 8, "h": 8 } },
+      "frame2": { "frame": { "x": 8, "y": 0, "w": 8, "h": 8 } }
+    },
+    "meta": {
+      "image": "bouncing2-8x8.png",
+      "size": { "w": 64, "h": 64 },
+      "scale": "1"
+    }
+  }
