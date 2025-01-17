@@ -1,12 +1,14 @@
-import { Graphics } from "pixi.js";
-import { borderBoard, widthBoard } from "../common";
+import { Container, Graphics } from "pixi.js";
+import { borderBoard, widthBoard, widthItem } from "../common";
 import Piece from "../models/piece_abstract";
 
-export default class StateManager {
+export default class StateManager extends Container {
     private static instance: StateManager;
     public boardState: { post: { x: number, y: number, name: string }, piece: Piece | null, focus: Graphics | null }[][];
+    private move?: { indexX: number, indexY: number };
 
     constructor() {
+        super();
         const widthItem = (widthBoard - borderBoard * 2) / 8;
 
         this.boardState = Array.from({ length: 8 }, (_, row) =>
@@ -18,7 +20,6 @@ export default class StateManager {
         );
     }
 
-    
     // func lay danh sách bên trắng, bên đen (turn) => quân cờ // trung
     // minimax // phong, duc, trung
     // func gia lap (board state, quan co dang xet) => danh sach ban co moi // trung
@@ -51,7 +52,6 @@ export default class StateManager {
                     item.piece.x = item.post.x;
                     item.piece.y = item.post.y;
                 }
-
             })
         })
     }
@@ -61,5 +61,34 @@ export default class StateManager {
             StateManager.instance = new StateManager();
         }
         return StateManager.instance;
+    }
+
+    public updateFocus(indexX: number, indexY: number) {
+        this.boardState.forEach((row) => {
+            row.forEach((item) => {
+                if (item.focus) {
+                    this.removeChild(item.focus);
+                    item.focus = null;
+                }
+            })
+        });
+
+        if (this.move == undefined && this.boardState[indexX][indexY].piece != null) {
+            const rect = new Graphics();
+            rect.lineStyle(2, 0x000000);
+            rect.drawRect(this.boardState[indexX][indexY].post.x - widthItem / 2, this.boardState[indexX][indexY].post.y - widthItem / 2, widthItem, widthItem);
+            this.boardState[indexX][indexY].focus = rect;
+            this.addChild(rect);
+            this.move = { indexX: indexX, indexY: indexY };
+        } else {
+            if (this.boardState[indexX][indexY].focus != null) {
+                this.movePiece();
+            }
+            this.move = undefined;
+        }
+    }
+
+    public movePiece() {
+
     }
 }

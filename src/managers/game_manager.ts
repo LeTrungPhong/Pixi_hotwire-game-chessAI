@@ -136,6 +136,7 @@ export default class GameManager extends Container {
         const inputController = new InputController(this.scaleScene, app);
         inputController.load();
         this.addChild(inputController);
+        this.addChild(stateManager); 
     }
 
     public initialize() {
