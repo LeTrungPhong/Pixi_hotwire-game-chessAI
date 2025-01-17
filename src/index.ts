@@ -54,6 +54,8 @@ async function loadAssets() {
 
         engineGame.show()
 
+        console.log(engineGame.getPositiveMoveAt(3, 4))
+
         app.stage.addChild(engineGame);
     } catch (error) {
         console.error('Lỗi khi tải ảnh:', error);

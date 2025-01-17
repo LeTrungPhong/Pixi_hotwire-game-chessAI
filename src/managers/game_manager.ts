@@ -94,7 +94,7 @@ export default class GameManager extends Container {
         stateManager.addState(6, 7, whitePawn_8);
         stateManager.addState(7, 0, whiteRook_1);
         stateManager.addState(7, 1, whiteKnight_1);
-        stateManager.addState(7, 2, whiteBishop_1);
+        stateManager.addState(4, 3, whiteBishop_1);
         stateManager.addState(7, 3, whiteQueen);
         stateManager.addState(7, 4, whiteKing);
         stateManager.addState(7, 5, whiteBishop_2);
@@ -152,8 +152,11 @@ export default class GameManager extends Container {
         this.scaleScene
     }
 
-    public show(){
-        const stateManager = StateManager.getInstance();
-        stateManager.show();
+    public show() {
+        StateManager.getInstance().show();
+    }
+
+    public getPositiveMoveAt(X: number, Y: number) : { indexX: number; indexY: number; }[]{
+        return StateManager.getInstance().getPositiveMoveAt(X, Y);
     }
 }

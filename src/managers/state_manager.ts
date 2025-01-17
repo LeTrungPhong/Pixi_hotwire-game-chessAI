@@ -106,7 +106,7 @@ export default class StateManager extends Container {
                 _ _ _ _ _ _ _ _
                 P P P P P P P P
                 R N B Q K B N R 
-                
+
         */
         this.boardState.forEach(row => {
             let rowString = "";
@@ -130,5 +130,32 @@ export default class StateManager extends Container {
             })
             console.log(rowString);
         })
+    }
+
+
+    public getPositiveMoveAt(X: number, Y: number): { indexX: number; indexY: number; }[]{
+        const myPiece: any = this.boardState[Y][X].piece;
+
+        const myPieceValue: number = myPiece?.getValue() ?? 0;
+
+        const positiveMove: { indexX: number; indexY: number; }[] = []
+
+        console.log(myPieceValue)
+
+        if (!myPieceValue){
+            return positiveMove;
+        }
+
+        switch (Math.abs(myPieceValue)) {
+            case 45:
+                positiveMove.push(...myPiece.move(this.boardState, Y, X));
+                break;
+        
+            default:
+                break;
+        }
+
+        return positiveMove
+
     }
 }
