@@ -19,5 +19,13 @@ export default abstract class Piece extends Sprite {
         this.moved
     }
 
+    public setValue(newValue: number){
+        this.value = newValue
+    }
+
+    public getValue(){
+        return this.value
+    }
+
     public abstract move(): { indexX: number, indexY: number }[];
 }

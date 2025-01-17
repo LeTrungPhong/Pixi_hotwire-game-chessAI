@@ -12,10 +12,19 @@ import StateManager from "./state_manager";
 import InputController from "./input_controller";
 
 export default class GameManager extends Container {
+    /* 
+        DEFINE PIECES's VALUE:
+            PAWN: 10
+            KNIGHT: 30
+            BISHOP: 45
+            ROOK: 50
+            QUEEN: 90
+            KING: 900
+    */
     private scaleScene: number;
     private boardScene: BoardScene;
 
-    constructor(textures: { name: string, src: Texture}[], app: Application<HTMLCanvasElement>) {
+    constructor(textures: { name: string, src: Texture }[], app: Application<HTMLCanvasElement>) {
         super();
 
         const textureBoard = textures.find(asset => asset.name === 'bouncing')?.src;
@@ -23,8 +32,8 @@ export default class GameManager extends Container {
         this.boardScene = new BoardScene(textureBoard);
 
         const whiteKing = new King("white_king", 900, false, this.scaleScene, textures.find(assets => assets.name === 'white-king')?.src);
-        const whiteBishop_1 = new Bishop("white_bishop", 35, false, this.scaleScene, textures.find(assets => assets.name === 'white-bishop')?.src);
-        const whiteBishop_2 = new Bishop("white_bishop", 35, false, this.scaleScene, textures.find(assets => assets.name === 'white-bishop')?.src);
+        const whiteBishop_1 = new Bishop("white_bishop", 45, false, this.scaleScene, textures.find(assets => assets.name === 'white-bishop')?.src);
+        const whiteBishop_2 = new Bishop("white_bishop", 45, false, this.scaleScene, textures.find(assets => assets.name === 'white-bishop')?.src);
         const whiteKnight_1 = new Knight("white_knight", 30, false, this.scaleScene, textures.find(assets => assets.name === 'white-knight')?.src);
         const whiteKnight_2 = new Knight("white_knight", 30, false, this.scaleScene, textures.find(assets => assets.name === 'white-knight')?.src);
         const whitePawn_1 = new Pawn("white_pawn", 10, false, this.scaleScene, textures.find(assets => assets.name === 'white-pawn')?.src);
@@ -40,8 +49,8 @@ export default class GameManager extends Container {
         const whiteRook_2 = new Rook("white_rook", 50, false, this.scaleScene, textures.find(assets => assets.name === 'white-rook')?.src);
 
         const blackKing = new King("black_king", -900, false, this.scaleScene, textures.find(assets => assets.name === 'black-king')?.src);
-        const blackBishop_1 = new Bishop("black_bishop", -35, false, this.scaleScene, textures.find(assets => assets.name === 'black-bishop')?.src);
-        const blackBishop_2 = new Bishop("black_bishop", -35, false, this.scaleScene, textures.find(assets => assets.name === 'black-bishop')?.src);
+        const blackBishop_1 = new Bishop("black_bishop", -45, false, this.scaleScene, textures.find(assets => assets.name === 'black-bishop')?.src);
+        const blackBishop_2 = new Bishop("black_bishop", -45, false, this.scaleScene, textures.find(assets => assets.name === 'black-bishop')?.src);
         const blackKnight_1 = new Knight("black_knight", -30, false, this.scaleScene, textures.find(assets => assets.name === 'black-knight')?.src);
         const blackKnight_2 = new Knight("black_knight", -30, false, this.scaleScene, textures.find(assets => assets.name === 'black-knight')?.src);
         const blackPawn_1 = new Pawn("black_pawn", -10, false, this.scaleScene, textures.find(assets => assets.name === 'black-pawn')?.src);
@@ -92,7 +101,7 @@ export default class GameManager extends Container {
         stateManager.addState(7, 6, whiteKnight_2);
         stateManager.addState(7, 7, whiteRook_2);
         stateManager.setPost();
- 
+
         // create pieceManager()
         const pieceManager = PieceManager.getInstance();
         pieceManager.addPiece(whiteKing);
@@ -136,10 +145,15 @@ export default class GameManager extends Container {
         const inputController = new InputController(this.scaleScene, app);
         inputController.load();
         this.addChild(inputController);
-        this.addChild(stateManager); 
+        this.addChild(stateManager);
     }
 
     public initialize() {
         this.scaleScene
+    }
+
+    public show(){
+        const stateManager = StateManager.getInstance();
+        stateManager.show();
     }
 }

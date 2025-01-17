@@ -50,8 +50,11 @@ async function loadAssets() {
 
         app.renderer.resize(widthBoard, heightBoard);
 
+        const engineGame = new GameManager(textures, app)
 
-        app.stage.addChild(new GameManager(textures, app));
+        engineGame.show()
+
+        app.stage.addChild(engineGame);
     } catch (error) {
         console.error('Lỗi khi tải ảnh:', error);
     }
@@ -65,6 +68,7 @@ app.ticker.add(() => {
     // console.log(app.ticker.FPS);
     // sceny.update(1 / app.ticker.FPS);
 })
+
 
 
 

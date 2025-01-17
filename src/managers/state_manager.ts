@@ -93,4 +93,42 @@ export default class StateManager extends Container {
         // code
         // ...........
     }
+
+    public show() {
+        /*
+            THIS METHOD IS UTILIZED TO SHOW BOARD STATE
+
+                r n b q k b n r 
+                p p p p p p p p
+                _ _ _ _ _ _ _ _
+                _ _ _ _ _ _ _ _
+                _ _ _ _ _ _ _ _
+                _ _ _ _ _ _ _ _
+                P P P P P P P P
+                R N B Q K B N R 
+                
+        */
+        this.boardState.forEach(row => {
+            let rowString = "";
+            row.forEach(col => {
+                let pieceChar = "_";
+                switch (col.piece?.getValue()) {
+                    case 10: pieceChar = "P"; break;
+                    case 30: pieceChar = "N"; break;
+                    case 45: pieceChar = "B"; break;
+                    case 50: pieceChar = "R"; break;
+                    case 90: pieceChar = "Q"; break;
+                    case 900: pieceChar = "K"; break;
+                    case -10: pieceChar = "p"; break;
+                    case -30: pieceChar = "n"; break;
+                    case -45: pieceChar = "b"; break;
+                    case -50: pieceChar = "r"; break;
+                    case -90: pieceChar = "q"; break;
+                    case -900: pieceChar = "k"; break;
+                }
+                rowString += pieceChar + " ";
+            })
+            console.log(rowString);
+        })
+    }
 }

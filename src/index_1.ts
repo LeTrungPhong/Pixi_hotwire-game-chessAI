@@ -95,17 +95,3 @@ app.stage.addChild(bitmapTexty);
 // Filter
 // Particles
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
