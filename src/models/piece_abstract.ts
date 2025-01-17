@@ -1,6 +1,6 @@
 import { Sprite, Texture } from "pixi.js";
 
-export default class Piece extends Sprite {
+export default abstract class Piece extends Sprite {
     private value: number;
     private moved: boolean;
 
@@ -19,7 +19,5 @@ export default class Piece extends Sprite {
         this.moved
     }
 
-    public move() {
-        
-    }
+    public abstract move(): { indexX: number, indexY: number }[];
 }

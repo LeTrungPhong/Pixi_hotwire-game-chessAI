@@ -75,13 +75,13 @@ export default class StateManager extends Container {
 
         if (this.move == undefined && this.boardState[indexX][indexY].piece != null) {
             const rect = new Graphics();
-            rect.lineStyle(2, 0x000000);
+            rect.lineStyle(2, 0xFF0000);
             rect.drawRect(this.boardState[indexX][indexY].post.x - widthItem / 2, this.boardState[indexX][indexY].post.y - widthItem / 2, widthItem, widthItem);
             this.boardState[indexX][indexY].focus = rect;
             this.addChild(rect);
             this.move = { indexX: indexX, indexY: indexY };
         } else {
-            if (this.boardState[indexX][indexY].focus != null) {
+            if (this.boardState[indexX][indexY].focus != null && (indexX != this.move?.indexX || indexY != this.move?.indexY)) {
                 this.movePiece();
             }
             this.move = undefined;

@@ -5,6 +5,10 @@ export default class King extends Piece {
     constructor(name: string, value: number, moved: boolean, scaleScene: number, texture?: Texture) {
         super(name, value, moved, scaleScene, texture);
     }
+
+    public override move(): { indexX: number; indexY: number; }[] {
+        return [];
+    }
 }
 
 // phong
