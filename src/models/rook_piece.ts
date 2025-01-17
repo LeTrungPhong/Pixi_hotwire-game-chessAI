@@ -41,7 +41,7 @@ export default class Rook extends Piece {
           break;
         }
 
-        const pieceValue = boardState[newX][newY].piece?.value ?? 0;
+        const pieceValue = boardState[newY][newX].piece?.value ?? 0;
 
         if (pieceValue === 0) {
           // Empty position

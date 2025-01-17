@@ -45,7 +45,7 @@ export default class Queen extends Piece {
         )
           break;
 
-        const piece = boardState[newX][newY].piece;
+        const piece = boardState[newY][newX].piece;
         const pieceValue = piece?.value ?? 0;
 
         if (pieceValue === 0) {
