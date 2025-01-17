@@ -89,6 +89,8 @@ export default class StateManager extends Container {
     }
 
     public movePiece() {
-
+        // code move
+        // code
+        // ...........
     }
 }
