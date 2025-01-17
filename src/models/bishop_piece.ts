@@ -6,7 +6,7 @@ export default class Bishop extends Piece {
         super(name, value, moved, scaleScene, texture);
     }
 
-    public override move(boardState: any, startY: number, startX: number): { indexX: number; indexY: number; }[] {
+    public override move(boardState: any, startX: number, startY: number): { indexX: number; indexY: number; }[] {
         const positiveMove: { indexX: number; indexY: number; }[] = []
 
         const dxList = [1, -1]
@@ -26,7 +26,7 @@ export default class Bishop extends Piece {
 
                     // If current position is still on board, check value in this position
                     // If it's null or inverse value, push it into result array
-                    let positionValue = boardState[currentY][currentX].piece?.value ?? 0;
+                    let positionValue = boardState[currentX][currentY].piece?.value ?? 0;
                     if (positionValue == 0) {
                         positiveMove.push({ indexX: currentX, indexY: currentY });
                         continue;

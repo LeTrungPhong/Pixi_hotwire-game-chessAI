@@ -73,12 +73,35 @@ export default class StateManager extends Container {
             })
         });
 
-        if (this.move == undefined && this.boardState[indexX][indexY].piece != null) {
+        if (
+            this.move == undefined &&
+            indexX >= 0 && indexX < this.boardState.length &&
+            indexY >= 0 && indexY < this.boardState[indexX]?.length &&
+            this.boardState[indexX]?.[indexY]?.piece != null
+        ) {
+
             const rect = new Graphics();
             rect.lineStyle(2, 0xFF0000);
             rect.drawRect(this.boardState[indexX][indexY].post.x - widthItem / 2, this.boardState[indexX][indexY].post.y - widthItem / 2, widthItem, widthItem);
             this.boardState[indexX][indexY].focus = rect;
             this.addChild(rect);
+
+            const piece = this.boardState[indexX][indexY].piece;
+            if (piece) {
+                const listMovePiece = piece.move(this.boardState, indexX, indexY);
+                listMovePiece.forEach(item => {
+                    const indexX = item?.indexX;
+                    const indexY = item?.indexY;
+                    if (indexX != null && indexY != null) {
+                        const rect = new Graphics();
+                        rect.lineStyle(2, 0xFF0000);
+                        rect.drawRect(this.boardState[indexX][indexY].post.x - widthItem / 2, this.boardState[indexX][indexY].post.y - widthItem / 2, widthItem, widthItem);
+                        this.boardState[indexX][indexY].focus = rect;
+                        this.addChild(rect);
+                    }
+                });
+            }
+
             this.move = { indexX: indexX, indexY: indexY };
         } else {
             if (this.boardState[indexX][indexY].focus != null && (indexX != this.move?.indexX || indexY != this.move?.indexY)) {
