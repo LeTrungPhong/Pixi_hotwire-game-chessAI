@@ -50,12 +50,12 @@ export default class Queen extends Piece {
 
         if (pieceValue === 0) {
           // Empty position
-          validMoves.push({ indexX: newX, indexY: newY });
+          validMoves.push({ indexX: newY, indexY: newX });
         } else {
           // Position occupied
           if (this.getValue() * pieceValue < 0) {
             // Opponent's piece
-            validMoves.push({ indexX: newX, indexY: newY });
+            validMoves.push({ indexX: newY, indexY: newX });
           }
           break; // Stop further movement in this direction because we can't move over our own pieces with queen
         }
