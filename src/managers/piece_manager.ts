@@ -14,6 +14,15 @@ export default class PieceManager extends Container {
         this.addChild(piece);
     }
 
+    public removePiece(piece: Piece | null) {
+        if( piece == null ) return;
+        const index = this.listPiece.indexOf(piece);
+        if (index > -1) {
+            this.listPiece.splice(index, 1);
+            this.removeChild(piece);
+        }
+    }
+
     public static getInstance(): PieceManager {
         if (!PieceManager.instance) {
             PieceManager.instance = new PieceManager();
