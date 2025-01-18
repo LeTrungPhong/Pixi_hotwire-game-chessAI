@@ -22,7 +22,11 @@ export default class Pawn extends Piece {
                 return positiveMove;
             }
             const direction = this.getValue() > 0 ? -1 : 1;
+<<<<<<< HEAD
             if (!(startY == 7 && direction == 1) && !(startY == 0 && direction == -1)) {
+=======
+            if (!(startY==7&&direction==1)&&!(startY==0&&direction==-1)){
+>>>>>>> 1bbc434b91431cb6c34836ed40d36c9ae98089e1
                 endY += direction;
             }
             for (let i = -1; i <= 1; i += 2) {
@@ -61,3 +65,6 @@ export default class Pawn extends Piece {
 }
 
 // hoang
+
+// hoang bi dien hehehe
+// hehehe
