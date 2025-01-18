@@ -6,8 +6,15 @@ export default class Pawn extends Piece {
         super(name, value, moved, scaleScene, texture);
     }
 
-    public override move(): { indexX: number; indexY: number; }[] {
-        return [];
+    public override move(boardState: any, startX: number, startY: number): { indexX: number; indexY: number; }[] {
+        boardState
+        startX
+        startY
+        const validMoves: { indexX: number; indexY: number }[] = [];
+        validMoves
+
+
+        return validMoves;
     }
 }
 

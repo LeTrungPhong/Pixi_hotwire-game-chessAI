@@ -94,12 +94,12 @@ export default class GameManager extends Container {
         stateManager.addState(6, 7, whitePawn_8);
         stateManager.addState(7, 0, whiteRook_1);
         stateManager.addState(7, 1, whiteKnight_1);
-        stateManager.addState(4, 3, whiteBishop_1);
+        stateManager.addState(7, 2, whiteBishop_1);
         stateManager.addState(7, 3, whiteQueen);
-        stateManager.addState(7, 4, whiteKing);
+        stateManager.addState(4, 4, whiteKing);
         stateManager.addState(7, 5, whiteBishop_2);
         stateManager.addState(7, 6, whiteKnight_2);
-        stateManager.addState(7, 7, whiteRook_2);
+        stateManager.addState(4, 7, whiteRook_2);
         stateManager.setPost();
 
         // create pieceManager()
