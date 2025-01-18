@@ -1,6 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import { borderBoard, widthBoard, widthItem } from "../common";
 import Piece from "../models/piece_abstract";
+import PieceManager from "./piece_manager";
 
 export default class StateManager extends Container {
   private static instance: StateManager;
@@ -103,6 +104,8 @@ export default class StateManager extends Container {
       const piece = this.boardState[indexX][indexY].piece;
       if (piece) {
         const listMovePiece = piece.move(this.boardState, indexX, indexY);
+        // console.log(listMovePiece);
+        
         listMovePiece.forEach((item) => {
           const indexX = item?.indexX;
           const indexY = item?.indexY;
@@ -124,11 +127,12 @@ export default class StateManager extends Container {
       this.move = { indexX: indexX, indexY: indexY };
     } else {
       if (
-        // this.boardState[indexX][indexY].focus != null &&
-        (indexX != this.move?.indexX || indexY != this.move?.indexY)
+        (indexX !== this.move?.indexX || indexY !== this.move?.indexY) &&
+        this.move != undefined
       ) {
         this.movePiece(indexX, indexY);
       }
+
       this.move = undefined;
     }
   }
@@ -136,15 +140,40 @@ export default class StateManager extends Container {
   public movePiece(destX: number, destY: number) {
     const startX = this.move?.indexX;
     const startY = this.move?.indexY;
-    if (startX != null && startY != null && destX != null && destY != null) {
-      const piece = this.boardState[startX][startY].piece;
+
+    // Kiểm tra nếu tọa độ ban đầu và tọa độ đích hợp lệ
+    if (
+      startX !== undefined &&
+      startY !== undefined &&
+      (destX !== startX || destY !== startY)
+    ) {
+      const piece = this.boardState[startX][startY]?.piece;
+
+      // Kiểm tra nếu có quân cờ tại vị trí ban đầu
       if (piece) {
-        this.boardState[destX][destY].piece =
-          this.boardState[startX][startY].piece;
-        this.boardState[startX][startY].piece = null;
-        this.setPost();
+        const validMoves = piece.move(this.boardState, startX, startY);
+
+        // Kiểm tra nước đi có hợp lệ không
+        const isValidMove = validMoves.some(
+          (move) => move.indexX === destX && move.indexY === destY
+        );
+
+        if (isValidMove) {
+          // Xử lý việc xóa quân cờ bị ăn
+          const capturedPiece = this.boardState[destX][destY]?.piece;
+          PieceManager.getInstance().removePiece(capturedPiece);
+          // Di chuyển quân cờ
+          this.boardState[destX][destY].piece = piece;
+          this.boardState[startX][startY].piece = null;
+
+          this.setPost();
+        } else {
+          console.log(`Invalid move to (${destX}, ${destY})`);
+        }
       }
     }
+
+    this.move = undefined;
   }
 
   public show() {
