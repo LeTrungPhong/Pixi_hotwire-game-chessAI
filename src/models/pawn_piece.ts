@@ -42,6 +42,8 @@ export default class Pawn extends Piece {
         }
         return positiveMove;
     }
+
+    //dwidwdjwaodjaodapdaowdoajdaodadaoowoaodoawo
 }
 
 // hoang
