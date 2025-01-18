@@ -14,8 +14,8 @@ export default class Queen extends Piece {
 
   public override move(
     boardState: any,
-    startY: number,
-    startX: number
+    startX: number,
+    startY: number
   ): { indexX: number; indexY: number }[] {
     const validMoves: { indexX: number; indexY: number }[] = [];
 
@@ -45,20 +45,19 @@ export default class Queen extends Piece {
         )
           break;
 
-        const piece = boardState[newY][newX].piece;
+        const piece = boardState[newX][newY].piece;
         const pieceValue = piece?.value ?? 0;
 
-        if (pieceValue === 0) {
+        if (pieceValue == 0) {
           // Empty position
-          validMoves.push({ indexX: newY, indexY: newX });
-        } else {
-          // Position occupied
-          if (this.getValue() * pieceValue < 0) {
-            // Opponent's piece
-            validMoves.push({ indexX: newY, indexY: newX });
-          }
-          break; // Stop further movement in this direction because we can't move over our own pieces with queen
+          validMoves.push({ indexX: newX, indexY: newY });
         }
+        // Position occupied
+        if (this.getValue() * pieceValue < 0) {
+          // Opponent's piece
+          validMoves.push({ indexX: newX, indexY: newY });
+          break;
+        } else break; // Stop further movement in this direction because we can't move over our own pieces with queen
       }
     });
 
