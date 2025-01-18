@@ -13,11 +13,7 @@ export default class Pawn extends Piece {
         if (Math.abs(this.getValue()) == 10){
             //nuoc di cua quan tot
             const direction = this.getValue() > 0 ? -1 : 1;
-<<<<<<< HEAD
-            if (!(startY==7&&direction==-1)&&!(startY==0&&direction==1)){
-=======
             if (!(startY==7&&direction==1)&&!(startY==0&&direction==-1)){
->>>>>>> refs/remotes/origin/master
                 endY += direction;
             }
             for (let i=-1 ; i<=1 ; i+=2){
@@ -49,3 +45,6 @@ export default class Pawn extends Piece {
 }
 
 // hoang
+
+// hoang bi dien hehehe
+// hehehe
