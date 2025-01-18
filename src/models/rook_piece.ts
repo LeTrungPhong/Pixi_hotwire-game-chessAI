@@ -14,8 +14,8 @@ export default class Rook extends Piece {
 
   public override move(
     boardState: any,
-    startY: number,
-    startX: number
+    startX: number,
+    startY: number
   ): { indexX: number; indexY: number }[] {
     const validMoves: { indexX: number; indexY: number }[] = [];
 
@@ -41,17 +41,18 @@ export default class Rook extends Piece {
           break;
         }
 
-        const pieceValue = boardState[newY][newX].piece?.value ?? 0;
+        const pieceValue = boardState[newX][newY].piece?.value ?? 0;
 
         if (pieceValue === 0) {
           // Empty position
           validMoves.push({ indexX: newX, indexY: newY });
-        } else if (this.getValue() * pieceValue < 0) {
+          continue;
+        }
+        if (this.getValue() * pieceValue < 0) {
           // Position occupied by an opponent's piece
           validMoves.push({ indexX: newX, indexY: newY });
-          break; // Stop moving further in this direction
+          break;
         } else {
-          // Position is occupied by our own piece
           break;
         }
       }
