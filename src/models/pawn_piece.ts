@@ -2,7 +2,6 @@ import {
     Texture
 } from "pixi.js";
 import Piece from "./piece_abstract";
-import Queen from "./queen_piece";
 
 export default class Pawn extends Piece {
     constructor(name: string, value: number, moved: boolean, scaleScene: number, texture ? : Texture) {
@@ -52,15 +51,10 @@ export default class Pawn extends Piece {
                 });
             }
             return positiveMove;
-        } else if (Math.abs(this.getValue()) == 90) {
-            //nuoc di quan hau
-            Queen.prototype.move(boardState, startX, startY);
-        }
+        } 
         return positiveMove;
     }
 }
 
 // hoang
 
-// hoang bi dien hehehe
-// hehehe
