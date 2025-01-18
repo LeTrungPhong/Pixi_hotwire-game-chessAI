@@ -46,12 +46,13 @@ export default class Rook extends Piece {
         if (pieceValue === 0) {
           // Empty position
           validMoves.push({ indexX: newX, indexY: newY });
-        } else if (this.getValue() * pieceValue < 0) {
+          continue;
+        }
+        if (this.getValue() * pieceValue < 0) {
           // Position occupied by an opponent's piece
           validMoves.push({ indexX: newX, indexY: newY });
-          break; // Stop moving further in this direction
+          break;
         } else {
-          // Position is occupied by our own piece
           break;
         }
       }

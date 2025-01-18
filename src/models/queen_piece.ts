@@ -51,6 +51,7 @@ export default class Queen extends Piece {
         if (pieceValue == 0) {
           // Empty position
           validMoves.push({ indexX: newX, indexY: newY });
+          continue;
         }
         // Position occupied
         if (this.getValue() * pieceValue < 0) {
