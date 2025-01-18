@@ -140,6 +140,7 @@ export default class StateManager extends Container {
   public movePiece(destX: number, destY: number) {
     const startX = this.move?.indexX;
     const startY = this.move?.indexY;
+    
 
     // Kiểm tra nếu tọa độ ban đầu và tọa độ đích hợp lệ
     if (
@@ -152,7 +153,7 @@ export default class StateManager extends Container {
       // Kiểm tra nếu có quân cờ tại vị trí ban đầu
       if (piece) {
         const validMoves = piece.move(this.boardState, startX, startY);
-
+      
         // Kiểm tra nước đi có hợp lệ không
         const isValidMove = validMoves.some(
           (move) => move.indexX === destX && move.indexY === destY
@@ -174,6 +175,14 @@ export default class StateManager extends Container {
     }
 
     this.move = undefined;
+    console.log("Move piece");
+    
+    if (this.isKingInCheck({indexX: 0, indexY: 4}, false, this.boardState)) {
+      console.log("Black king is in check");
+    }
+    if (this.checkMate({indexX: 0, indexY: 4}, false, this.boardState)){
+      console.log("Black king is in checkmate");
+    }
   }
 
   public show() {
@@ -264,5 +273,104 @@ export default class StateManager extends Container {
     }
 
     return positiveMove;
+  }
+
+  public parstLocateArray(postX: number, postY: number): { indexX: number, indexY: number } {
+    const indexX = Math.floor((postY - borderBoard) / widthItem);
+    const indexY = Math.floor((postX - borderBoard) / widthItem);
+
+    return { indexX: indexX, indexY: indexY };
+  }
+
+  public getAllPosibleMove(boardState: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][], isWhiteTurn: boolean): { indexX: number; indexY: number }[] {
+    if (isWhiteTurn) {
+      return boardState.filter((row) => row.some((item) => item.piece && item.piece.getValue() > 0))
+    .flatMap((row) => row.flatMap((item) => {
+      if (item.piece) {
+        const position = this.parstLocateArray(item.post.x, item.post.y);
+        var legalMove = item.piece.move(boardState, position.indexX, position.indexY);
+        return legalMove;
+      }
+      return [];
+    }));
+    }else {
+      return boardState.filter((row) => row.some((item) => item.piece && item.piece.getValue() < 0))
+      .flatMap((row) => row.flatMap((item) => {
+        if (item.piece) {
+          const position = this.parstLocateArray(item.post.x, item.post.y);
+          var legalMove = item.piece.move(boardState, position.indexX, position.indexY);
+          return legalMove;
+        }
+        return [];
+      }));
+    }
+
+  }
+
+  public deepCopyArray(array: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][]) {
+
+    let arrayCopy = array.map(row =>
+      row.map(element => ({
+        post: { ...element.post }, 
+        piece: element.piece ? { ...element.piece } : null, 
+        focus: element.focus ? { ...element.focus } : null, 
+      }))
+    );
+    return arrayCopy;
+  }
+  
+  public isMoveValidAgainstCheck(legalMove: { indexX: number; indexY: number }[], startPosition: { indexX: number; indexY: number }, isWhiteTurn: boolean): { indexX: number; indexY: number }[] {
+
+    let legalMoveCopy = legalMove.slice();
+    legalMoveCopy.forEach((item) => {
+      let piece = this.boardState[startPosition.indexX][startPosition.indexY].piece;
+      let pieceCp = this.boardState[item.indexX][item.indexY].piece;
+      this.boardState[startPosition.indexX][startPosition.indexY].piece = null;
+      this.boardState[item.indexX][item.indexY].piece = piece;
+      if (this.isKingInCheck({indexX: item.indexX, indexY: item.indexY}, isWhiteTurn, this.boardState)) {
+        legalMove = legalMove.filter((item2) => item2.indexX !== item.indexX && item2.indexY !== item.indexY);
+      }
+      this.boardState[startPosition.indexX][startPosition.indexY].piece = piece;
+      this.boardState[item.indexX][item.indexY].piece = pieceCp;
+    });
+    return legalMove;
+  }
+
+  public isKingInCheck(KingPosition: { indexX: number; indexY: number }, isWhiteKing: boolean, boardState: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][]): boolean {
+      console.log(KingPosition);
+      let legalMove = this.getAllPosibleMove(boardState, !isWhiteKing);
+      console.log(legalMove);
+      console.log(KingPosition);
+      if (legalMove.some((item) => item.indexX === KingPosition.indexX && item.indexY === KingPosition.indexY)) {
+        return true;
+      }
+      console.log("King is not in check");
+      return false;
+  }
+
+  public checkMate(KingPosition: { indexX: number; indexY: number }, isWhiteTurn: boolean, boardState: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][]): boolean {
+    let legalMove = this.getAllPosibleMove(boardState, isWhiteTurn);
+    let iswhiteKing = isWhiteTurn;
+    legalMove = this.isMoveValidAgainstCheck(legalMove, KingPosition, iswhiteKing);
+    if (legalMove.length == 0) {
+      return true;
+    } 
+    return false;
   }
 }
