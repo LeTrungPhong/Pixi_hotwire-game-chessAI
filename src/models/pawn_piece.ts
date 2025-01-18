@@ -39,6 +39,7 @@ export default class Pawn extends Piece {
             //=bishop + rook
 
         }
+
     }
 }
 
