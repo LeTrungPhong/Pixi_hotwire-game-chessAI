@@ -12,8 +12,8 @@ export default class Pawn extends Piece {
         var endY: number = startY;
         if (Math.abs(this.getValue()) == 10){
             //nuoc di cua quan tot
-            const direction = this.getValue() > 0 ? 1 : -1;
-            if (!(startY==7&&direction==1)&&!(startY==0&&direction==-1)){
+            const direction = this.getValue() > 0 ? -1 : 1;
+            if (!(startY==7&&direction==-1)&&!(startY==0&&direction==1)){
                 endY += direction;
             }
             for (let i=-1 ; i<=1 ; i+=2){
