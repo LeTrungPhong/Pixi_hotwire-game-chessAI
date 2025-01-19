@@ -474,13 +474,13 @@ export default class StateManager extends Container {
       .flatMap((row) => row.flatMap((item) => {
         if (item.piece&& item.piece.getValue() < 0) {
           const position = this.parstLocateArray(item.post.x, item.post.y);
-          console.log("begin");
+          // console.log("begin");
           var legalMove = item.piece.move(boardState, position.indexX, position.indexY);
-          console.log(legalMove);
-          console.log("end");
+          // console.log(legalMove);
+          // console.log("end");
           legalMove = this.isMoveValidAgainstCheck(legalMove, position, isWhiteTurn, KingPosition);
-          console.log("end2");
-          console.log(legalMove);
+          // console.log("end2");
+          // console.log(legalMove);
           return legalMove;
         }
         return [];
@@ -577,9 +577,9 @@ public canPieceAttackKing(KingPosition: { indexX: number; indexY: number }, boar
     piece: Piece | null;
     focus: Graphics | null;
   }[][]): boolean {
-    console.log(KingPosition);
+    // console.log(KingPosition);
     let legalMove = this.getAllPosibleMove(boardState, isWhiteTurn, KingPosition);
-    console.log(legalMove);
+    // console.log(legalMove);
     if (legalMove.length == 0) {
       return true;
     } 
