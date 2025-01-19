@@ -310,7 +310,7 @@ export default class StateManager extends Container {
       });
       // console.log(rowString);
     });
-  }
+  } ///
 
   public getPositiveMoveAt(
     X: number,
