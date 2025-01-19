@@ -87,6 +87,13 @@ export default class King extends Piece {
     }
     return validMoves;
   }
+
+    public override cloneObject(): Piece {
+        const newObject: King = new King("", this.getValue(), this.moved, 0, undefined);
+        newObject.x = this.x;
+        newObject.y = this.y;
+        return newObject
+    }
 }
 
 // phong

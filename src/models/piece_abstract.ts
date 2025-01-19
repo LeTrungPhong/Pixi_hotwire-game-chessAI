@@ -2,7 +2,7 @@ import { Sprite, Texture } from "pixi.js";
 
 export default abstract class Piece extends Sprite {
     private value: number;
-    private moved: boolean;
+    public moved: boolean;
 
     constructor(name: string, value: number, moved: boolean, scaleScene: number, texture?: Texture) {
         super(texture);
@@ -35,5 +35,11 @@ export default abstract class Piece extends Sprite {
         this.moved = moved
     }
 
+    public getName() {
+        return this.name
+    }
+
     public abstract move(boardState: any, statrX: number, startY: number): { indexX: number, indexY: number }[];
+
+    public abstract cloneObject(): Piece;
 }
