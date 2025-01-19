@@ -10,9 +10,12 @@ export default class StateManager extends Container {
     focus: Graphics | null;
   }[][];
   private move?: { indexX: number; indexY: number };
-  private moveAI?: { start: { indexX: number, indexY: number }, end: { indexX: number, indexY: number } };
-  public whiteKing?: { indexX: number, indexY: number }
-  public blackKing?: { indexX: number, indexY: number }
+  private moveAI?: {
+    start: { indexX: number; indexY: number };
+    end: { indexX: number; indexY: number };
+  };
+  public whiteKing?: { indexX: number; indexY: number };
+  public blackKing?: { indexX: number; indexY: number };
 
   constructor() {
     super();
@@ -38,14 +41,16 @@ export default class StateManager extends Container {
 
   public addState(row: number, column: number, piece: Piece) {
     this.boardState[row][column].piece = piece;
-    this.addChild(piece)
+    this.addChild(piece);
   }
 
-  public setPost(boardState: {
-    post: { x: number; y: number; name: string };
-    piece: Piece | null;
-    focus: Graphics | null;
-  }[][]) {
+  public setPost(
+    boardState: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][]
+  ) {
     boardState.forEach((row) => {
       row.forEach((item) => {
         // const circle = new Graphics();
@@ -112,7 +117,7 @@ export default class StateManager extends Container {
       if (piece) {
         const listMovePiece = piece.move(this.boardState, indexX, indexY);
         // console.log(listMovePiece);
-        
+
         listMovePiece.forEach((item) => {
           const indexX = item?.indexX;
           const indexY = item?.indexY;
@@ -144,71 +149,126 @@ export default class StateManager extends Container {
         this.copyListPiece(boardStateCopy, computer, player);
         // console.log(boardStateCopy)
         this.setPost(boardStateCopy);
-        console.log(this.minimax(boardStateCopy, 100000, -100000, 3, 3, true, computer, player));
-        this.movePiece(this.boardState, this.moveAI?.start, this.moveAI?.end.indexX || 0, this.moveAI?.end.indexY || 0);
+        console.log(
+          this.minimax(
+            boardStateCopy,
+            100000,
+            -100000,
+            3,
+            3,
+            true,
+            computer,
+            player
+          )
+        );
+        this.movePiece(
+          this.boardState,
+          this.moveAI?.start,
+          this.moveAI?.end.indexX || 0,
+          this.moveAI?.end.indexY || 0
+        );
       }
 
       this.move = undefined;
     }
   }
 
-  public movePiece(boardState: any, move: { indexX: number, indexY: number } | undefined, destX: number, destY: number) {
+  public movePiece(
+    boardState: any,
+    move: { indexX: number; indexY: number } | undefined,
+    destX: number,
+    destY: number
+  ) {
     const startX = move?.indexX;
     const startY = move?.indexY;
 
     // Kiểm tra nếu tọa độ ban đầu và tọa độ đích hợp lệ
     if (
-      startX !== undefined &&
-      startY !== undefined &&
-      (destX !== startX || destY !== startY)
-    ) {
-      const piece = boardState[startX][startY]?.piece;
+      startX === undefined ||
+      startY === undefined ||
+      (destX === startX && destY === startY)
+    )
+      return;
 
-      // Kiểm tra nếu có quân cờ tại vị trí ban đầu
-      if (piece) {
-      
-        const validMoves: { indexX: number, indexY: number }[] = piece.move(boardState, startX, startY);
+    const piece = boardState[startX][startY]?.piece;
 
-        // Kiểm tra nước đi có hợp lệ không
-        const isValidMove = validMoves.some(
-          (move) => move.indexX === destX && move.indexY === destY
-        );
+    // Kiểm tra nếu có quân cờ tại vị trí ban đầu
+    if (!piece) return;
 
-        if (isValidMove) {
-          // Xử lý việc xóa quân cờ bị ăn
-          const capturedPiece = boardState[destX][destY]?.piece;
-          if (capturedPiece) {
-            this.removeChild(capturedPiece);
-          }
-          // PieceManager.getInstance().removePiece(capturedPiece);
-          // Di chuyển quân cờ
-          boardState[destX][destY].piece = piece;
-          boardState[startX][startY].piece = null;
-          this.setPost(boardState);
+    const validMoves: { indexX: number; indexY: number }[] = piece.move(
+      boardState,
+      startX,
+      startY
+    );
 
-          if (piece.getValue() == 900) {
-            this.whiteKing = { indexX: destX, indexY: destY };
-          } else if (piece.getValue() == -900) {
-            this.blackKing = { indexX: destX, indexY: destY };
-          }
-        } else {
-          console.log(`Invalid move to (${destX}, ${destY}, ${startX}, ${startY})`);
-          console.log(piece)
-        }
-      }
+    // Kiểm tra nước đi có hợp lệ không
+    const isValidMove = validMoves.some(
+      (move) => move.indexX === destX && move.indexY === destY
+    );
+
+    // Kiểm tra nước đi có hợp lệ không
+    if (!isValidMove) {
+      console.log(`Invalid move to (${destX}, ${destY})`);
+      return;
     }
-    this.move = undefined;
 
-  
-    if (this.isKingInCheck({indexX: 0, indexY: 4}, false, this.boardState)) {
+    const capturedPiece = boardState[destX][destY]?.piece;
+
+    // Xử lý trường hợp nhập thành
+    if (capturedPiece && capturedPiece.getValue() * piece.getValue() > 0) {
+      let moveOffset = 0;
+      let rookOffset = 0;
+
+      if (Math.abs(piece.getValue()) === 50) {
+        // Quân xe nhập thành
+        moveOffset = startY > destY ? 2 : -2;
+        rookOffset = startY > destY ? -1 : 1;
+        boardState[destX][destY + moveOffset].piece = capturedPiece;
+        boardState[startX][destY + moveOffset + rookOffset].piece = piece;
+      } else {
+        // Quân vua nhập thành
+        moveOffset = startY > destY ? -2 : 2;
+        rookOffset = startY > destY ? 1 : -1;
+        boardState[destX][startY + moveOffset].piece = piece;
+        boardState[startX][startY + moveOffset + rookOffset].piece =
+          capturedPiece;
+      }
+      boardState[startX][startY].piece = null;
+      boardState[destX][destY].piece = null;
+    } else {
+      // Xử lý việc ăn quân hoặc di chuyển bình thường
+      if (capturedPiece) {
+        this.removeChild(capturedPiece);
+      }
+      boardState[destX][destY].piece = piece;
+      boardState[startX][startY].piece = null;
+    }
+    piece.setMoved(true);
+
+    this.setPost(boardState);
+
+    if (piece.getValue() == 900) {
+      this.whiteKing = { indexX: destX, indexY: destY };
+    } else if (piece.getValue() == -900) {
+      this.blackKing = { indexX: destX, indexY: destY };
+    }
+
+    if (this.isKingInCheck({ indexX: 0, indexY: 4 }, false, this.boardState)) {
       console.log("Black king is in check");
     }
-    if (this.checkMate({indexX: 0, indexY: 4}, false, this.boardState)){
+    if (this.checkMate({ indexX: 0, indexY: 4 }, false, this.boardState)) {
       console.log("Black king is in checkmate");
     }
+    // Reset trạng thái nước đi
+    this.move = undefined;
   }
 
-  public movePieceAI(boardState: any, move: { indexX: number, indexY: number } | undefined, destX: number, destY: number) {
+  public movePieceAI(
+    boardState: any,
+    move: { indexX: number; indexY: number } | undefined,
+    destX: number,
+    destY: number
+  ) {
     const startX = move?.indexX;
     const startY = move?.indexY;
 
@@ -222,8 +282,11 @@ export default class StateManager extends Container {
 
       // Kiểm tra nếu có quân cờ tại vị trí ban đầu
       if (piece) {
-      
-        const validMoves: { indexX: number, indexY: number }[] = piece.move(boardState, startX, startY);
+        const validMoves: { indexX: number; indexY: number }[] = piece.move(
+          boardState,
+          startX,
+          startY
+        );
 
         // Kiểm tra nước đi có hợp lệ không
         const isValidMove = validMoves.some(
@@ -242,8 +305,10 @@ export default class StateManager extends Container {
           boardState[startX][startY].piece = null;
           this.setPost(boardState);
         } else {
-          console.log(`Invalid move to (${destX}, ${destY}, ${startX}, ${startY})`);
-          console.log(piece)
+          console.log(
+            `Invalid move to (${destX}, ${destY}, ${startX}, ${startY})`
+          );
+          console.log(piece);
         }
       }
     }
@@ -340,25 +405,36 @@ export default class StateManager extends Container {
     return positiveMove;
   }
 
-  public valueCal(boardState: {
-    post: { x: number; y: number; name: string };
-    piece: Piece | null;
-    focus: Graphics | null;
-  }[][]): number {
+  public valueCal(
+    boardState: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][]
+  ): number {
     let sum: number = 0;
     boardState.forEach((row) => {
       row.forEach((item) => {
         if (item.piece) {
           sum += item.piece.getValue();
         }
-      })
-    })
+      });
+    });
     return sum;
   }
   // (boardstate, quan trang, quan den, do sau, luot, )
 
   // (!) copy boardState -> computer, player
-  public minimax(boardState: any, anpha: number, beta: number, depth: number, selectDepth: number, turn: boolean, computer: Piece[], player: Piece[]): number {
+  public minimax(
+    boardState: any,
+    anpha: number,
+    beta: number,
+    depth: number,
+    selectDepth: number,
+    turn: boolean,
+    computer: Piece[],
+    player: Piece[]
+  ): number {
     let checkKingComputer: boolean = false;
     let checkKingPlayer: boolean = false;
     // check king computer
@@ -366,13 +442,13 @@ export default class StateManager extends Container {
       if (item.getValue() == -900) {
         checkKingComputer = true;
       }
-    })
+    });
     // check king player
     player.forEach((item) => {
       if (item.getValue() == 900) {
         checkKingPlayer = true;
       }
-    })
+    });
 
     if (depth == 0 || checkKingComputer == false || checkKingPlayer == false) {
       return this.valueCal(boardState);
@@ -380,33 +456,56 @@ export default class StateManager extends Container {
 
     // turn computer
     if (turn) {
-      
       for (let i: number = 0; i < computer.length; ++i) {
         const indexX = Math.floor((computer[i].y - borderBoard) / widthItem);
         const indexY = Math.floor((computer[i].x - borderBoard) / widthItem);
         // if (indexX < 0 || indexY < 0) console.log(computer[i].y + " " + computer[i].x)
         const validMove = computer[i].move(boardState, indexX, indexY);
-        
+
         validMove.forEach((item) => {
-          if (item.indexX < 0 || item.indexY < 0 || item.indexX > 7 || item.indexY > 7) {
-            console.log("x: " + item.indexX + ", y: " + item.indexY)
+          if (
+            item.indexX < 0 ||
+            item.indexY < 0 ||
+            item.indexX > 7 ||
+            item.indexY > 7
+          ) {
+            console.log("x: " + item.indexX + ", y: " + item.indexY);
           }
-        })
-        
+        });
 
         for (let j: number = 0; j < validMove.length; ++j) {
           const boardStateCopy = this.copyBoardState(boardState);
           const playerCopy: Piece[] = [];
           const computerCopy: Piece[] = [];
           this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-          this.movePieceAI(boardStateCopy, { indexX: indexX, indexY: indexY }, validMove[j].indexX, validMove[j].indexY);
+          this.movePieceAI(
+            boardStateCopy,
+            { indexX: indexX, indexY: indexY },
+            validMove[j].indexX,
+            validMove[j].indexY
+          );
 
-          const scoreNew: number = this.minimax(boardStateCopy, anpha, beta, depth - 1, selectDepth, false, computerCopy, playerCopy);
+          const scoreNew: number = this.minimax(
+            boardStateCopy,
+            anpha,
+            beta,
+            depth - 1,
+            selectDepth,
+            false,
+            computerCopy,
+            playerCopy
+          );
           if (anpha > scoreNew) {
             anpha = scoreNew;
-            
+
             if (depth == selectDepth) {
-              this.moveAI = { start: { indexX: indexX, indexY: indexY }, end: { indexX: validMove[j].indexX, indexY: validMove[j].indexY } };
+              this.moveAI = {
+                start: { indexX: indexX, indexY: indexY },
+                end: {
+                  indexX: validMove[j].indexX,
+                  indexY: validMove[j].indexY,
+                },
+              };
             }
           }
           // console.log("computer, " + "score: " + score, "depth: " + depth);
@@ -417,83 +516,138 @@ export default class StateManager extends Container {
       for (let i: number = 0; i < player.length; ++i) {
         const indexX = Math.floor((player[i].y - borderBoard) / widthItem);
         const indexY = Math.floor((player[i].x - borderBoard) / widthItem);
-        if (indexX < 0 || indexY < 0) console.log(player[i].y + " " + player[i].x)
+        if (indexX < 0 || indexY < 0)
+          console.log(player[i].y + " " + player[i].x);
         const validMove = player[i].move(boardState, indexX, indexY);
-        
+
         validMove.forEach((item) => {
-          if (item.indexX < 0 || item.indexY < 0 || item.indexX > 7 || item.indexY > 7) {
-            console.log("x: " + item.indexX + ", y: " + item.indexY)
+          if (
+            item.indexX < 0 ||
+            item.indexY < 0 ||
+            item.indexX > 7 ||
+            item.indexY > 7
+          ) {
+            console.log("x: " + item.indexX + ", y: " + item.indexY);
           }
-        })
+        });
 
         for (let j: number = 0; j < validMove.length; ++j) {
           const boardStateCopy = this.copyBoardState(boardState);
           const playerCopy: Piece[] = [];
           const computerCopy: Piece[] = [];
           this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-          this.movePieceAI(boardStateCopy, { indexX: indexX, indexY: indexY }, validMove[j].indexX, validMove[j].indexY);
+          this.movePieceAI(
+            boardStateCopy,
+            { indexX: indexX, indexY: indexY },
+            validMove[j].indexX,
+            validMove[j].indexY
+          );
 
-          const scoreNew: number = this.minimax(boardStateCopy, anpha, beta, depth - 1, selectDepth, true, computerCopy, playerCopy);
-          beta = Math.max(beta, scoreNew); 
+          const scoreNew: number = this.minimax(
+            boardStateCopy,
+            anpha,
+            beta,
+            depth - 1,
+            selectDepth,
+            true,
+            computerCopy,
+            playerCopy
+          );
+          beta = Math.max(beta, scoreNew);
           // console.log("player, " + "score: " + score, "depth: " + depth);
         }
       }
       return beta;
     }
 
-    anpha
-    beta
+    anpha;
+    beta;
   }
 
-  public parstLocateArray(postX: number, postY: number): { indexX: number, indexY: number } {
+  public parstLocateArray(
+    postX: number,
+    postY: number
+  ): { indexX: number; indexY: number } {
     const indexX = Math.floor((postY - borderBoard) / widthItem);
     const indexY = Math.floor((postX - borderBoard) / widthItem);
 
     return { indexX: indexX, indexY: indexY };
   }
 
-
-  public getAllPosibleMove(boardState: {
-    post: { x: number; y: number; name: string };
-    piece: Piece | null;
-    focus: Graphics | null;
-  }[][], isWhiteTurn: boolean, KingPosition: { indexX: number; indexY: number }): { indexX: number; indexY: number }[] {
+  public getAllPosibleMove(
+    boardState: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][],
+    isWhiteTurn: boolean,
+    KingPosition: { indexX: number; indexY: number }
+  ): { indexX: number; indexY: number }[] {
     if (isWhiteTurn) {
-      return boardState.filter((row) => row.some((item) => item.piece && item.piece.getValue() > 0))
-    .flatMap((row) => row.flatMap((item) => {
-      if (item.piece) {
-        const position = this.parstLocateArray(item.post.x, item.post.y);
-        var legalMove = item.piece.move(boardState, position.indexX, position.indexY);
-        legalMove = this.isMoveValidAgainstCheck(legalMove, position, isWhiteTurn, KingPosition);
-        return legalMove;
-      }
-      return [];
-    }));
-    }else {
-      return boardState.filter((row) => row.some((item) => (item.piece && item.piece.getValue() < 0)))
-      .flatMap((row) => row.flatMap((item) => {
-        if (item.piece&& item.piece.getValue() < 0) {
-          const position = this.parstLocateArray(item.post.x, item.post.y);
-          console.log("begin");
-          var legalMove = item.piece.move(boardState, position.indexX, position.indexY);
-          console.log(legalMove);
-          console.log("end");
-          legalMove = this.isMoveValidAgainstCheck(legalMove, position, isWhiteTurn, KingPosition);
-          console.log("end2");
-          console.log(legalMove);
-          return legalMove;
-        }
-        return [];
-      }));
+      return boardState
+        .filter((row) =>
+          row.some((item) => item.piece && item.piece.getValue() > 0)
+        )
+        .flatMap((row) =>
+          row.flatMap((item) => {
+            if (item.piece) {
+              const position = this.parstLocateArray(item.post.x, item.post.y);
+              var legalMove = item.piece.move(
+                boardState,
+                position.indexX,
+                position.indexY
+              );
+              legalMove = this.isMoveValidAgainstCheck(
+                legalMove,
+                position,
+                isWhiteTurn,
+                KingPosition
+              );
+              return legalMove;
+            }
+            return [];
+          })
+        );
+    } else {
+      return boardState
+        .filter((row) =>
+          row.some((item) => item.piece && item.piece.getValue() < 0)
+        )
+        .flatMap((row) =>
+          row.flatMap((item) => {
+            if (item.piece && item.piece.getValue() < 0) {
+              const position = this.parstLocateArray(item.post.x, item.post.y);
+              console.log("begin");
+              var legalMove = item.piece.move(
+                boardState,
+                position.indexX,
+                position.indexY
+              );
+              console.log(legalMove);
+              console.log("end");
+              legalMove = this.isMoveValidAgainstCheck(
+                legalMove,
+                position,
+                isWhiteTurn,
+                KingPosition
+              );
+              console.log("end2");
+              console.log(legalMove);
+              return legalMove;
+            }
+            return [];
+          })
+        );
     }
-
   }
 
-  public copyBoardState(boardState: {
-    post: { x: number; y: number; name: string };
-    piece: Piece | null;
-    focus: Graphics | null;
-  }[][]) {
+  public copyBoardState(
+    boardState: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][]
+  ) {
     const boardStateCopy: {
       post: { x: number; y: number; name: string };
       piece: Piece | null;
@@ -501,7 +655,9 @@ export default class StateManager extends Container {
     }[][] = Array.from({ length: boardState.length }, (_, row) =>
       Array.from({ length: boardState[row].length }, (_, col) => {
         const currentCell = boardState[row][col];
-        const clonedPiece = currentCell.piece ? currentCell.piece.cloneObject() : null;
+        const clonedPiece = currentCell.piece
+          ? currentCell.piece.cloneObject()
+          : null;
         return {
           post: { ...currentCell.post },
           piece: clonedPiece,
@@ -509,23 +665,31 @@ export default class StateManager extends Container {
         };
       })
     );
-  
+
     return boardStateCopy;
   }
-  
-  public isMoveValidAgainstCheck(legalMove: { indexX: number; indexY: number }[], startPosition: { indexX: number; indexY: number }, isWhiteTurn: boolean, KingPosition: { indexX: number; indexY: number }): { indexX: number; indexY: number }[] {
 
+  public isMoveValidAgainstCheck(
+    legalMove: { indexX: number; indexY: number }[],
+    startPosition: { indexX: number; indexY: number },
+    isWhiteTurn: boolean,
+    KingPosition: { indexX: number; indexY: number }
+  ): { indexX: number; indexY: number }[] {
     const validMoves: { indexX: number; indexY: number }[] = [];
     legalMove.forEach((item) => {
-      let piece = this.boardState[startPosition.indexX][startPosition.indexY].piece;
+      let piece =
+        this.boardState[startPosition.indexX][startPosition.indexY].piece;
       let pieceCp = this.boardState[item.indexX][item.indexY].piece;
       this.boardState[startPosition.indexX][startPosition.indexY].piece = null;
       this.boardState[item.indexX][item.indexY].piece = piece;
       if (this.isKingInCheck(KingPosition, isWhiteTurn, this.boardState)) {
-        console.log("Check at: "+this.boardState[item.indexX][item.indexY].piece?.getValue());
+        console.log(
+          "Check at: " +
+            this.boardState[item.indexX][item.indexY].piece?.getValue()
+        );
         console.log(piece);
         console.log(item.indexX, item.indexY);
-      }else {
+      } else {
         validMoves.push(item);
       }
       this.boardState[startPosition.indexX][startPosition.indexY].piece = piece;
@@ -534,55 +698,88 @@ export default class StateManager extends Container {
     return validMoves;
   }
 
-  public isKingInCheck(KingPosition: { indexX: number; indexY: number }, isWhiteKing: boolean, boardState: {
-    post: { x: number; y: number; name: string };
-    piece: Piece | null;
-    focus: Graphics | null;
-  }[][]): boolean {
-    if (isWhiteKing){
-      return boardState.some((row) => row.some((item) => {
-        var position = this.parstLocateArray(item.post.x, item.post.y);
-        if (item.piece && item.piece.getValue() < 0 && this.canPieceAttackKing(KingPosition, boardState, position)) {
-      
-          return true;
-        }
-        return false;
-    }));
-    }else {
-        return boardState.some((row) => row.some((item) => { 
+  public isKingInCheck(
+    KingPosition: { indexX: number; indexY: number },
+    isWhiteKing: boolean,
+    boardState: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][]
+  ): boolean {
+    if (isWhiteKing) {
+      return boardState.some((row) =>
+        row.some((item) => {
           var position = this.parstLocateArray(item.post.x, item.post.y);
-          if (item.piece && item.piece.getValue() > 0 && this.canPieceAttackKing( KingPosition, boardState, position)) {
+          if (
+            item.piece &&
+            item.piece.getValue() < 0 &&
+            this.canPieceAttackKing(KingPosition, boardState, position)
+          ) {
             return true;
           }
           return false;
-      }));
+        })
+      );
+    } else {
+      return boardState.some((row) =>
+        row.some((item) => {
+          var position = this.parstLocateArray(item.post.x, item.post.y);
+          if (
+            item.piece &&
+            item.piece.getValue() > 0 &&
+            this.canPieceAttackKing(KingPosition, boardState, position)
+          ) {
+            return true;
+          }
+          return false;
+        })
+      );
     }
   }
 
   // Hàm kiểm tra nếu một quân cờ có thể tấn công vua hay không
-public canPieceAttackKing(KingPosition: { indexX: number; indexY: number }, boardState: {
-  post: { x: number; y: number; name: string };
-  piece: Piece | null;
-  focus: Graphics | null;
-}[][], position: { indexX: number; indexY: number }): boolean {
+  public canPieceAttackKing(
+    KingPosition: { indexX: number; indexY: number },
+    boardState: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][],
+    position: { indexX: number; indexY: number }
+  ): boolean {
+    const possibleMoves = boardState[position.indexX][
+      position.indexY
+    ].piece?.move(boardState, position.indexX, position.indexY);
 
-  const possibleMoves = boardState[position.indexX][position.indexY].piece?.move(boardState, position.indexX, position.indexY);
+    return possibleMoves
+      ? possibleMoves?.some(
+          (move) =>
+            move.indexX === KingPosition.indexX &&
+            move.indexY === KingPosition.indexY
+        )
+      : false;
+  }
 
-  return possibleMoves? possibleMoves?.some((move) => move.indexX === KingPosition.indexX && move.indexY === KingPosition.indexY):false;
-
-}
-
-  public checkMate(KingPosition: { indexX: number; indexY: number }, isWhiteTurn: boolean, boardState: {
-    post: { x: number; y: number; name: string };
-    piece: Piece | null;
-    focus: Graphics | null;
-  }[][]): boolean {
+  public checkMate(
+    KingPosition: { indexX: number; indexY: number },
+    isWhiteTurn: boolean,
+    boardState: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][]
+  ): boolean {
     console.log(KingPosition);
-    let legalMove = this.getAllPosibleMove(boardState, isWhiteTurn, KingPosition);
+    let legalMove = this.getAllPosibleMove(
+      boardState,
+      isWhiteTurn,
+      KingPosition
+    );
     console.log(legalMove);
     if (legalMove.length == 0) {
       return true;
-    } 
+    }
     return false;
   }
 
@@ -598,11 +795,15 @@ public canPieceAttackKing(KingPosition: { indexX: number; indexY: number }, boar
   //   return copy;
   // }
 
-  public copyListPiece(boardState: {
-    post: { x: number; y: number; name: string };
-    piece: Piece | null;
-    focus: Graphics | null;
-  }[][], computer: Piece[], player: Piece[]) {
+  public copyListPiece(
+    boardState: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][],
+    computer: Piece[],
+    player: Piece[]
+  ) {
     boardState.forEach((row) => {
       row.forEach((item) => {
         if (item.piece) {
@@ -612,7 +813,7 @@ public canPieceAttackKing(KingPosition: { indexX: number; indexY: number }, boar
             computer.push(item.piece);
           }
         }
-      })
+      });
     });
   }
 }
