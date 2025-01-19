@@ -11,6 +11,8 @@ export default class StateManager extends Container {
   }[][];
   private move?: { indexX: number; indexY: number };
   private moveAI?: { start: { indexX: number, indexY: number }, end: { indexX: number, indexY: number } };
+  public whiteKing?: { indexX: number, indexY: number }
+  public blackKing?: { indexX: number, indexY: number }
 
   constructor() {
     super();
@@ -183,6 +185,12 @@ export default class StateManager extends Container {
           boardState[destX][destY].piece = piece;
           boardState[startX][startY].piece = null;
           this.setPost(boardState);
+
+          if (piece.getValue() == 900) {
+            this.whiteKing = { indexX: destX, indexY: destY };
+          } else if (piece.getValue() == -900) {
+            this.blackKing = { indexX: destX, indexY: destY };
+          }
         } else {
           console.log(`Invalid move to (${destX}, ${destY}, ${startX}, ${startY})`);
           console.log(piece)
@@ -198,6 +206,48 @@ export default class StateManager extends Container {
     if (this.checkMate({indexX: 0, indexY: 4}, false, this.boardState)){
       console.log("Black king is in checkmate");
     }
+  }
+
+  public movePieceAI(boardState: any, move: { indexX: number, indexY: number } | undefined, destX: number, destY: number) {
+    const startX = move?.indexX;
+    const startY = move?.indexY;
+
+    // Kiểm tra nếu tọa độ ban đầu và tọa độ đích hợp lệ
+    if (
+      startX !== undefined &&
+      startY !== undefined &&
+      (destX !== startX || destY !== startY)
+    ) {
+      const piece = boardState[startX][startY]?.piece;
+
+      // Kiểm tra nếu có quân cờ tại vị trí ban đầu
+      if (piece) {
+      
+        const validMoves: { indexX: number, indexY: number }[] = piece.move(boardState, startX, startY);
+
+        // Kiểm tra nước đi có hợp lệ không
+        const isValidMove = validMoves.some(
+          (move) => move.indexX === destX && move.indexY === destY
+        );
+
+        if (isValidMove) {
+          // Xử lý việc xóa quân cờ bị ăn
+          const capturedPiece = boardState[destX][destY]?.piece;
+          if (capturedPiece) {
+            this.removeChild(capturedPiece);
+          }
+          // PieceManager.getInstance().removePiece(capturedPiece);
+          // Di chuyển quân cờ
+          boardState[destX][destY].piece = piece;
+          boardState[startX][startY].piece = null;
+          this.setPost(boardState);
+        } else {
+          console.log(`Invalid move to (${destX}, ${destY}, ${startX}, ${startY})`);
+          console.log(piece)
+        }
+      }
+    }
+    this.move = undefined;
   }
 
   public show() {
@@ -349,7 +399,7 @@ export default class StateManager extends Container {
           const playerCopy: Piece[] = [];
           const computerCopy: Piece[] = [];
           this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-          this.movePiece(boardStateCopy, { indexX: indexX, indexY: indexY }, validMove[j].indexX, validMove[j].indexY);
+          this.movePieceAI(boardStateCopy, { indexX: indexX, indexY: indexY }, validMove[j].indexX, validMove[j].indexY);
 
           const scoreNew: number = this.minimax(boardStateCopy, anpha, beta, depth - 1, selectDepth, false, computerCopy, playerCopy);
           if (anpha > scoreNew) {
@@ -381,7 +431,7 @@ export default class StateManager extends Container {
           const playerCopy: Piece[] = [];
           const computerCopy: Piece[] = [];
           this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-          this.movePiece(boardStateCopy, { indexX: indexX, indexY: indexY }, validMove[j].indexX, validMove[j].indexY);
+          this.movePieceAI(boardStateCopy, { indexX: indexX, indexY: indexY }, validMove[j].indexX, validMove[j].indexY);
 
           const scoreNew: number = this.minimax(boardStateCopy, anpha, beta, depth - 1, selectDepth, true, computerCopy, playerCopy);
           beta = Math.max(beta, scoreNew); 

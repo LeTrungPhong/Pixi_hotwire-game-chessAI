@@ -102,6 +102,9 @@ export default class GameManager extends Container {
         stateManager.addState(7, 7, whiteRook_2);
         stateManager.setPost(stateManager.boardState);
 
+        stateManager.whiteKing = { indexX: 7, indexY: 4 }
+        stateManager.blackKing = { indexX: 0, indexY: 4 }
+
         // create pieceManager()
         // const pieceManager = PieceManager.getInstance();
         // pieceManager.addPiece(whiteKing);
