@@ -26,7 +26,7 @@ export default class Knight extends Piece {
             const y = startY + move[1];
             if (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
                 if (boardState[y][x].piece == null || boardState[y][x].piece.getValue() * this.getValue() < 0) {
-                    console.log(y+""+x+""+boardState[y][x].piece);
+                    // console.log(y+""+x+""+boardState[y][x].piece);
                     positiveMove.push({
                         indexX: y,
                         indexY: x
@@ -35,6 +35,13 @@ export default class Knight extends Piece {
             }
         }
     return positiveMove;
+    }
+
+    public override cloneObject(): Piece {
+        const newObject: Knight = new Knight("", this.getValue(), this.moved, 0, undefined);
+        newObject.x = this.x;
+        newObject.y = this.y;
+        return newObject
     }
 }
 

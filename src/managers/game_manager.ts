@@ -7,7 +7,7 @@ import Bishop from "../models/bishop_piece";
 import Pawn from "../models/pawn_piece";
 import Queen from "../models/queen_piece";
 import Rook from "../models/rook_piece";
-import PieceManager from "./piece_manager";
+// import PieceManager from "./piece_manager";
 import StateManager from "./state_manager";
 import InputController from "./input_controller";
 
@@ -96,51 +96,51 @@ export default class GameManager extends Container {
         stateManager.addState(7, 1, whiteKnight_1);
         stateManager.addState(7, 2, whiteBishop_1);
         stateManager.addState(7, 3, whiteQueen);
-        stateManager.addState(4, 4, whiteKing);
+        stateManager.addState(7, 4, whiteKing);
         stateManager.addState(7, 5, whiteBishop_2);
         stateManager.addState(7, 6, whiteKnight_2);
-        stateManager.addState(4, 7, whiteRook_2);
-        stateManager.setPost();
+        stateManager.addState(7, 7, whiteRook_2);
+        stateManager.setPost(stateManager.boardState);
 
         // create pieceManager()
-        const pieceManager = PieceManager.getInstance();
-        pieceManager.addPiece(whiteKing);
-        pieceManager.addPiece(whiteBishop_1);
-        pieceManager.addPiece(whiteBishop_2);
-        pieceManager.addPiece(whiteKnight_1);
-        pieceManager.addPiece(whiteKnight_2);
-        pieceManager.addPiece(whitePawn_1);
-        pieceManager.addPiece(whitePawn_2);
-        pieceManager.addPiece(whitePawn_3);
-        pieceManager.addPiece(whitePawn_4);
-        pieceManager.addPiece(whitePawn_5);
-        pieceManager.addPiece(whitePawn_6);
-        pieceManager.addPiece(whitePawn_7);
-        pieceManager.addPiece(whitePawn_8);
-        pieceManager.addPiece(whiteQueen);
-        pieceManager.addPiece(whiteRook_1);
-        pieceManager.addPiece(whiteRook_2);
+        // const pieceManager = PieceManager.getInstance();
+        // pieceManager.addPiece(whiteKing);
+        // pieceManager.addPiece(whiteBishop_1);
+        // pieceManager.addPiece(whiteBishop_2);
+        // pieceManager.addPiece(whiteKnight_1);
+        // pieceManager.addPiece(whiteKnight_2);
+        // pieceManager.addPiece(whitePawn_1);
+        // pieceManager.addPiece(whitePawn_2);
+        // pieceManager.addPiece(whitePawn_3);
+        // pieceManager.addPiece(whitePawn_4);
+        // pieceManager.addPiece(whitePawn_5);
+        // pieceManager.addPiece(whitePawn_6);
+        // pieceManager.addPiece(whitePawn_7);
+        // pieceManager.addPiece(whitePawn_8);
+        // pieceManager.addPiece(whiteQueen);
+        // pieceManager.addPiece(whiteRook_1);
+        // pieceManager.addPiece(whiteRook_2);
 
-        pieceManager.addPiece(blackKing);
-        pieceManager.addPiece(blackBishop_1);
-        pieceManager.addPiece(blackBishop_2);
-        pieceManager.addPiece(blackKnight_1);
-        pieceManager.addPiece(blackKnight_2);
-        pieceManager.addPiece(blackPawn_1);
-        pieceManager.addPiece(blackPawn_2);
-        pieceManager.addPiece(blackPawn_3);
-        pieceManager.addPiece(blackPawn_4);
-        pieceManager.addPiece(blackPawn_5);
-        pieceManager.addPiece(blackPawn_6);
-        pieceManager.addPiece(blackPawn_7);
-        pieceManager.addPiece(blackPawn_8);
-        pieceManager.addPiece(blackQueen);
-        pieceManager.addPiece(blackRook_1);
-        pieceManager.addPiece(blackRook_2);
+        // pieceManager.addPiece(blackKing);
+        // pieceManager.addPiece(blackBishop_1);
+        // pieceManager.addPiece(blackBishop_2);
+        // pieceManager.addPiece(blackKnight_1);
+        // pieceManager.addPiece(blackKnight_2);
+        // pieceManager.addPiece(blackPawn_1);
+        // pieceManager.addPiece(blackPawn_2);
+        // pieceManager.addPiece(blackPawn_3);
+        // pieceManager.addPiece(blackPawn_4);
+        // pieceManager.addPiece(blackPawn_5);
+        // pieceManager.addPiece(blackPawn_6);
+        // pieceManager.addPiece(blackPawn_7);
+        // pieceManager.addPiece(blackPawn_8);
+        // pieceManager.addPiece(blackQueen);
+        // pieceManager.addPiece(blackRook_1);
+        // pieceManager.addPiece(blackRook_2);
 
         // add to ui
         this.addChild(this.boardScene);
-        this.addChild(pieceManager)
+        // this.addChild(pieceManager)
 
         const inputController = new InputController(this.scaleScene, app);
         inputController.load();

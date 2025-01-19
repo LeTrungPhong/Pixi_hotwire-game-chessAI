@@ -1,7 +1,6 @@
 import { Container, Graphics } from "pixi.js";
 import { borderBoard, widthBoard, widthItem } from "../common";
 import Piece from "../models/piece_abstract";
-import PieceManager from "./piece_manager";
 
 export default class StateManager extends Container {
   private static instance: StateManager;
@@ -11,6 +10,7 @@ export default class StateManager extends Container {
     focus: Graphics | null;
   }[][];
   private move?: { indexX: number; indexY: number };
+  private moveAI?: { start: { indexX: number, indexY: number }, end: { indexX: number, indexY: number } };
 
   constructor() {
     super();
@@ -36,10 +36,15 @@ export default class StateManager extends Container {
 
   public addState(row: number, column: number, piece: Piece) {
     this.boardState[row][column].piece = piece;
+    this.addChild(piece)
   }
 
-  public setPost() {
-    this.boardState.forEach((row) => {
+  public setPost(boardState: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][]) {
+    boardState.forEach((row) => {
       row.forEach((item) => {
         // const circle = new Graphics();
         // const centerX = item.post.x ;
@@ -130,16 +135,24 @@ export default class StateManager extends Container {
         (indexX !== this.move?.indexX || indexY !== this.move?.indexY) &&
         this.move != undefined
       ) {
-        this.movePiece(indexX, indexY);
+        this.movePiece(this.boardState, this.move, indexX, indexY);
+        const boardStateCopy = this.copyBoardState(this.boardState);
+        const computer: Piece[] = [];
+        const player: Piece[] = [];
+        this.copyListPiece(boardStateCopy, computer, player);
+        // console.log(boardStateCopy)
+        this.setPost(boardStateCopy);
+        console.log(this.minimax(boardStateCopy, 100000, -100000, 3, 3, true, computer, player));
+        this.movePiece(this.boardState, this.moveAI?.start, this.moveAI?.end.indexX || 0, this.moveAI?.end.indexY || 0);
       }
 
       this.move = undefined;
     }
   }
 
-  public movePiece(destX: number, destY: number) {
-    const startX = this.move?.indexX;
-    const startY = this.move?.indexY;
+  public movePiece(boardState: any, move: { indexX: number, indexY: number } | undefined, destX: number, destY: number) {
+    const startX = move?.indexX;
+    const startY = move?.indexY;
 
     // Kiểm tra nếu tọa độ ban đầu và tọa độ đích hợp lệ
     if (
@@ -147,11 +160,11 @@ export default class StateManager extends Container {
       startY !== undefined &&
       (destX !== startX || destY !== startY)
     ) {
-      const piece = this.boardState[startX][startY]?.piece;
+      const piece = boardState[startX][startY]?.piece;
 
       // Kiểm tra nếu có quân cờ tại vị trí ban đầu
       if (piece) {
-        const validMoves = piece.move(this.boardState, startX, startY);
+        const validMoves: { indexX: number, indexY: number }[] = piece.move(boardState, startX, startY);
 
         // Kiểm tra nước đi có hợp lệ không
         const isValidMove = validMoves.some(
@@ -160,20 +173,24 @@ export default class StateManager extends Container {
 
         if (isValidMove) {
           // Xử lý việc xóa quân cờ bị ăn
-          const capturedPiece = this.boardState[destX][destY]?.piece;
-          PieceManager.getInstance().removePiece(capturedPiece);
+          const capturedPiece = boardState[destX][destY]?.piece;
+          if (capturedPiece) {
+            this.removeChild(capturedPiece);
+          }
+          // PieceManager.getInstance().removePiece(capturedPiece);
           // Di chuyển quân cờ
-          this.boardState[destX][destY].piece = piece;
-          this.boardState[startX][startY].piece = null;
+          boardState[destX][destY].piece = piece;
+          boardState[startX][startY].piece = null;
 
-          this.setPost();
+          this.setPost(boardState);
         } else {
-          console.log(`Invalid move to (${destX}, ${destY})`);
+          console.log(`Invalid move to (${destX}, ${destY}, ${startX}, ${startY})`);
+          console.log(piece)
         }
       }
     }
 
-    this.move = undefined;
+    move = undefined;
   }
 
   public show() {
@@ -234,7 +251,7 @@ export default class StateManager extends Container {
         }
         rowString += pieceChar + " ";
       });
-      console.log(rowString);
+      // console.log(rowString);
     });
   }
 
@@ -264,5 +281,178 @@ export default class StateManager extends Container {
     }
 
     return positiveMove;
+  }
+
+  // (boardstate, quan trang, quan den, do sau, luot, )
+
+  // (!) copy boardState -> computer, player
+  public minimax(boardState: any, anpha: number, beta: number, depth: number, selectDepth: number, turn: boolean, computer: Piece[], player: Piece[]): number {
+    let checkKingComputer: boolean = false;
+    let checkKingPlayer: boolean = false;
+    // check king computer
+    computer.forEach((item) => {
+      if (item.getValue() == -900) {
+        checkKingComputer = true;
+      }
+    })
+    // check king player
+    player.forEach((item) => {
+      if (item.getValue() == 900) {
+        checkKingPlayer = true;
+      }
+    })
+
+    if (depth == 0 || checkKingComputer == false || checkKingPlayer == false) {
+      return this.valueCal(boardState);
+    }
+
+    // turn computer
+    if (turn) {
+      
+      for (let i: number = 0; i < computer.length; ++i) {
+        const indexX = Math.floor((computer[i].y - borderBoard) / widthItem);
+        const indexY = Math.floor((computer[i].x - borderBoard) / widthItem);
+        // if (indexX < 0 || indexY < 0) console.log(computer[i].y + " " + computer[i].x)
+        const validMove = computer[i].move(boardState, indexX, indexY);
+        
+        validMove.forEach((item) => {
+          if (item.indexX < 0 || item.indexY < 0 || item.indexX > 7 || item.indexY > 7) {
+            console.log("x: " + item.indexX + ", y: " + item.indexY)
+          }
+        })
+        
+
+        for (let j: number = 0; j < validMove.length; ++j) {
+          const boardStateCopy = this.copyBoardState(boardState);
+          const playerCopy: Piece[] = [];
+          const computerCopy: Piece[] = [];
+          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
+          this.movePiece(boardStateCopy, { indexX: indexX, indexY: indexY }, validMove[j].indexX, validMove[j].indexY);
+
+          const scoreNew: number = this.minimax(boardStateCopy, anpha, beta, depth - 1, selectDepth, false, computerCopy, playerCopy);
+          if (anpha > scoreNew) {
+            anpha = scoreNew;
+            
+            if (depth == selectDepth) {
+              this.moveAI = { start: { indexX: indexX, indexY: indexY }, end: { indexX: validMove[j].indexX, indexY: validMove[j].indexY } };
+            }
+          }
+          // console.log("computer, " + "score: " + score, "depth: " + depth);
+        }
+      }
+      return anpha;
+    } else {
+      for (let i: number = 0; i < player.length; ++i) {
+        const indexX = Math.floor((player[i].y - borderBoard) / widthItem);
+        const indexY = Math.floor((player[i].x - borderBoard) / widthItem);
+        if (indexX < 0 || indexY < 0) console.log(player[i].y + " " + player[i].x)
+        const validMove = player[i].move(boardState, indexX, indexY);
+        
+        validMove.forEach((item) => {
+          if (item.indexX < 0 || item.indexY < 0 || item.indexX > 7 || item.indexY > 7) {
+            console.log("x: " + item.indexX + ", y: " + item.indexY)
+          }
+        })
+
+        for (let j: number = 0; j < validMove.length; ++j) {
+          const boardStateCopy = this.copyBoardState(boardState);
+          const playerCopy: Piece[] = [];
+          const computerCopy: Piece[] = [];
+          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
+          this.movePiece(boardStateCopy, { indexX: indexX, indexY: indexY }, validMove[j].indexX, validMove[j].indexY);
+
+          const scoreNew: number = this.minimax(boardStateCopy, anpha, beta, depth - 1, selectDepth, true, computerCopy, playerCopy);
+          beta = Math.max(beta, scoreNew); 
+          // console.log("player, " + "score: " + score, "depth: " + depth);
+        }
+      }
+      return beta;
+    }
+
+    anpha
+    beta
+  }
+
+  public parstLocateArray(postX: number, postY: number): { indexX: number, indexY: number } {
+    const indexX = Math.floor((postY - borderBoard) / widthItem);
+    const indexY = Math.floor((postX - borderBoard) / widthItem);
+
+    return { indexX: indexX, indexY: indexY };
+  }
+
+  public copyBoardState(boardState: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][]) {
+    const boardStateCopy: {
+      post: { x: number; y: number; name: string };
+      piece: Piece | null;
+      focus: Graphics | null;
+    }[][] = Array.from({ length: boardState.length }, (_, row) =>
+      Array.from({ length: boardState[row].length }, (_, col) => {
+        const currentCell = boardState[row][col];
+        const clonedPiece = currentCell.piece ? currentCell.piece.cloneObject() : null;
+        return {
+          post: { ...currentCell.post },
+          piece: clonedPiece,
+          focus: null,
+        };
+      })
+    );
+  
+    return boardStateCopy;
+  }
+
+  // public override cloneObject(obj: any) {
+  //   const copy = Array.isArray(obj) ? [] : {};
+  //   for (let key in obj) {
+  //     if (obj[key] && typeof obj[key] === "object") {
+  //       copy[key] = this.cloneObject(obj[key]);
+  //     } else {
+  //       copy[key] = obj[key];
+  //     }
+  //   }
+  //   return copy;
+  // }
+
+  public cloneObject(obj: any) {
+    return Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+}
+
+  public copyListPiece(boardState: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][], computer: Piece[], player: Piece[]) {
+    boardState.forEach((row) => {
+      row.forEach((item) => {
+        if (item.piece) {
+          if (item.piece.getValue() > 0) {
+            player.push(item.piece);
+          } else {
+            computer.push(item.piece);
+          }
+        }
+      })
+    });
+  }
+
+  
+
+  public valueCal(boardState: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][]): number {
+    let sum: number = 0;
+    boardState.forEach((row) => {
+      row.forEach((item) => {
+        if (item.piece) {
+          sum += item.piece.getValue();
+        }
+      })
+    })
+    return sum;
   }
 }

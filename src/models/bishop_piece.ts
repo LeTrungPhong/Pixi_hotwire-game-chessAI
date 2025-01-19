@@ -43,6 +43,13 @@ export default class Bishop extends Piece {
 
         return positiveMove;
     }
+
+    public override cloneObject(): Piece {
+        const newObject: Bishop = new Bishop("", this.getValue(), this.moved, 0, undefined);
+        newObject.x = this.x;
+        newObject.y = this.y;
+        return newObject
+    }
 }
 
 // trung
