@@ -158,95 +158,69 @@ export default class StateManager extends Container {
 
     // Kiểm tra nếu tọa độ ban đầu và tọa độ đích hợp lệ
     if (
-      startX !== undefined &&
-      startY !== undefined &&
-      (destX !== startX || destY !== startY)
-    ) {
-      const piece = boardState[startX][startY]?.piece;
+      startX === undefined ||
+      startY === undefined ||
+      (destX === startX && destY === startY)
+    )
+      return;
 
-      // Kiểm tra nếu có quân cờ tại vị trí ban đầu
-      if (piece) {
-      
-        const validMoves: { indexX: number, indexY: number }[] = piece.move(boardState, startX, startY);
+    const piece = boardState[startX][startY]?.piece;
 
-        // Kiểm tra nước đi có hợp lệ không
-        const isValidMove = validMoves.some(
-          (move) => move.indexX === destX && move.indexY === destY
-        );
+    // Kiểm tra nếu có quân cờ tại vị trí ban đầu
+    if (!piece) return;
 
-        if (isValidMove) {
-          // Xử lý việc xóa quân cờ bị ăn
-          const capturedPiece = boardState[destX][destY]?.piece;
-          if (capturedPiece) {
-            this.removeChild(capturedPiece);
-          }
-          // PieceManager.getInstance().removePiece(capturedPiece);
-          // Di chuyển quân cờ
-          boardState[destX][destY].piece = piece;
-          boardState[startX][startY].piece = null;
-          this.setPost(boardState);
+    const validMoves: { indexX: number; indexY: number }[] = piece.move(
+      boardState,
+      startX,
+      startY
+    );
 
-          if (piece.getValue() == 900) {
-            this.whiteKing = { indexX: destX, indexY: destY };
-          } else if (piece.getValue() == -900) {
-            this.blackKing = { indexX: destX, indexY: destY };
-          }
-        } else {
-          console.log(`Invalid move to (${destX}, ${destY}, ${startX}, ${startY})`);
-          console.log(piece)
-        }
+    // Kiểm tra nước đi có hợp lệ không
+    const isValidMove = validMoves.some(
+      (move) => move.indexX === destX && move.indexY === destY
+    );
+
+    // Kiểm tra nước đi có hợp lệ không
+    if (!isValidMove) {
+      // console.log(`Invalid move to (${destX}, ${destY})`);
+      return;
+    }
+
+    const capturedPiece = boardState[destX][destY]?.piece;
+
+    // Xử lý trường hợp nhập thành
+    if (capturedPiece && capturedPiece.getValue() * piece.getValue() > 0) {
+      let moveOffset = 0;
+      let rookOffset = 0;
+
+      if (Math.abs(piece.getValue()) === 50) {
+        // Quân xe nhập thành
+        moveOffset = startY > destY ? 2 : -2;
+        rookOffset = startY > destY ? -1 : 1;
+        boardState[destX][destY + moveOffset].piece = capturedPiece;
+        boardState[startX][destY + moveOffset + rookOffset].piece = piece;
+      } else {
+        // Quân vua nhập thành
+        moveOffset = startY > destY ? -2 : 2;
+        rookOffset = startY > destY ? 1 : -1;
+        boardState[destX][startY + moveOffset].piece = piece;
+        boardState[startX][startY + moveOffset + rookOffset].piece =
+          capturedPiece;
       }
-    }
-    this.move = undefined;
-
-  
-    if (this.isKingInCheck({indexX: 0, indexY: 4}, false, this.boardState)) {
-      console.log("Black king is in check");
-    }
-    if (this.checkMate({indexX: 0, indexY: 4}, false, this.boardState)){
-      console.log("Black king is in checkmate");
-    }
-  }
-
-  public movePieceAI(boardState: any, move: { indexX: number, indexY: number } | undefined, destX: number, destY: number) {
-    const startX = move?.indexX;
-    const startY = move?.indexY;
-
-    // Kiểm tra nếu tọa độ ban đầu và tọa độ đích hợp lệ
-    if (
-      startX !== undefined &&
-      startY !== undefined &&
-      (destX !== startX || destY !== startY)
-    ) {
-      const piece = boardState[startX][startY]?.piece;
-
-      // Kiểm tra nếu có quân cờ tại vị trí ban đầu
-      if (piece) {
-      
-        const validMoves: { indexX: number, indexY: number }[] = piece.move(boardState, startX, startY);
-
-        // Kiểm tra nước đi có hợp lệ không
-        const isValidMove = validMoves.some(
-          (move) => move.indexX === destX && move.indexY === destY
-        );
-
-        if (isValidMove) {
-          // Xử lý việc xóa quân cờ bị ăn
-          const capturedPiece = boardState[destX][destY]?.piece;
-          if (capturedPiece) {
-            this.removeChild(capturedPiece);
-          }
-          // PieceManager.getInstance().removePiece(capturedPiece);
-          // Di chuyển quân cờ
-          boardState[destX][destY].piece = piece;
-          boardState[startX][startY].piece = null;
-          this.setPost(boardState);
-        } else {
-          console.log(`Invalid move to (${destX}, ${destY}, ${startX}, ${startY})`);
-          console.log(piece)
-        }
+      boardState[startX][startY].piece = null;
+      boardState[destX][destY].piece = null;
+    } else {
+      // Xử lý việc ăn quân hoặc di chuyển bình thường
+      if (capturedPiece) {
+        this.removeChild(capturedPiece);
       }
+      boardState[destX][destY].piece = piece;
+      boardState[startX][startY].piece = null;
     }
+    piece.setMoved(true);
+
+    this.setPost(boardState);
+    // Reset trạng thái nước đi
     this.move = undefined;
   }
 
