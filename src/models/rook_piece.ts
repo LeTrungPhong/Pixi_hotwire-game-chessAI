@@ -41,18 +41,22 @@ export default class Rook extends Piece {
           break;
         }
 
-        const pieceValue = boardState[newX][newY].piece?.value ?? 0;
+        const destPiece = boardState[newX][newY].piece ?? null;
 
-        if (pieceValue === 0) {
+        if (destPiece == null) {
           // Empty position
           validMoves.push({ indexX: newX, indexY: newY });
           continue;
         }
-        if (this.getValue() * pieceValue < 0) {
+        if (this.getValue() * destPiece.value < 0) {
           // Position occupied by an opponent's piece
           validMoves.push({ indexX: newX, indexY: newY });
           break;
         } else {
+          // Position occupied by a friendly King piece
+          if (Math.abs(destPiece.getValue()) == 900 && this.getMoved() == false && destPiece.getMoved() == false) {
+            validMoves.push({ indexX: newX, indexY: newY });
+          }
           break;
         }
       }

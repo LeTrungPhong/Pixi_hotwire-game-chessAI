@@ -27,5 +27,13 @@ export default abstract class Piece extends Sprite {
         return this.value
     }
 
+    public getMoved(){
+        return this.moved
+    }
+
+    public setMoved(moved: boolean){
+        this.moved = moved
+    }
+
     public abstract move(boardState: any, statrX: number, startY: number): { indexX: number, indexY: number }[];
 }

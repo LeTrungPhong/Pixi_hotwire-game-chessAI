@@ -26,7 +26,6 @@ export default class Knight extends Piece {
             const y = startY + move[1];
             if (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
                 if (boardState[y][x].piece == null || boardState[y][x].piece.getValue() * this.getValue() < 0) {
-                    console.log(y+""+x+""+boardState[y][x].piece);
                     positiveMove.push({
                         indexX: y,
                         indexY: x
