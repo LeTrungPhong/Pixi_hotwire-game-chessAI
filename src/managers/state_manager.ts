@@ -188,12 +188,9 @@ export default class StateManager extends Container {
         if (focus) {
           this.movePiece(this.boardState, this.move, indexX, indexY);
           this.app.renderer.render(this.app.stage); // check
-          console.log("Check player move")
+          // console.log("Check player move")
           setTimeout(() => {
             const boardStateCopy = this.copyBoardState(this.boardState);
-            const computer: Piece[] = [];
-            const player: Piece[] = [];
-            this.copyListPiece(boardStateCopy, computer, player);
             // console.log(boardStateCopy)
             this.setPost(boardStateCopy);
             console.log(
@@ -203,9 +200,7 @@ export default class StateManager extends Container {
                 -100000,
                 3,
                 3,
-                true,
-                computer,
-                player
+                true
               )
             );
             setTimeout(() => {
@@ -403,7 +398,9 @@ export default class StateManager extends Container {
 
     // Kiểm tra nước đi có hợp lệ không
     if (!isValidMove) {
-      // console.log(`Invalid move to (${destX}, ${destY})`);
+      this.show(boardState);
+      console.log(piece.getValue() + ` ${startX} ${startY}`);
+      console.log(`Invalid move to (${destX}, ${destY})`);
       return;
     }
 
@@ -432,9 +429,9 @@ export default class StateManager extends Container {
       boardState[destX][destY].piece = null;
     } else {
       // Xử lý việc ăn quân hoặc di chuyển bình thường
-      if (capturedPiece) {
-        this.removeChild(capturedPiece);
-      }
+      // if (capturedPiece) {
+      //   this.removeChild(capturedPiece);
+      // }
       boardState[destX][destY].piece = piece;
       boardState[startX][startY].piece = null;
     }
@@ -442,10 +439,14 @@ export default class StateManager extends Container {
 
     this.setPost(boardState);
     // Reset trạng thái nước đi
-    this.move = undefined;
+    move = undefined;
   }
 
-  public show() {
+  public show(boardState: {
+    post: { x: number; y: number; name: string };
+    piece: Piece | null;
+    focus: Graphics | null;
+  }[][]) {
     /*
             THIS METHOD IS UTILIZED TO SHOW BOARD STATE
 
@@ -459,7 +460,7 @@ export default class StateManager extends Container {
                 R N B Q K B N R 
 
         */
-    this.boardState.forEach((row) => {
+    boardState.forEach((row) => {
       let rowString = "";
       row.forEach((col) => {
         let pieceChar = "_";
@@ -503,7 +504,7 @@ export default class StateManager extends Container {
         }
         rowString += pieceChar + " ";
       });
-      // console.log(rowString);
+      console.log(rowString);
     });
   }
 
@@ -562,11 +563,12 @@ export default class StateManager extends Container {
     depth: number,
     selectDepth: number,
     turn: boolean,
-    computer: Piece[],
-    player: Piece[]
   ): number {
     let checkKingComputer: boolean = false;
     let checkKingPlayer: boolean = false;
+    const computer: Piece[] = [];
+    const player: Piece[] = [];
+    this.copyListPiece(boardState, computer, player);
     // check king computer
     computer.forEach((item) => {
       if (item.getValue() == -900) {
@@ -621,9 +623,7 @@ export default class StateManager extends Container {
             beta,
             depth - 1,
             selectDepth,
-            false,
-            computerCopy,
-            playerCopy
+            false
           );
           if (anpha > scoreNew) {
             anpha = scoreNew;
@@ -679,9 +679,7 @@ export default class StateManager extends Container {
             beta,
             depth - 1,
             selectDepth,
-            true,
-            computerCopy,
-            playerCopy
+            true
           );
           beta = Math.max(beta, scoreNew);
           // console.log("player, " + "score: " + score, "depth: " + depth);
@@ -689,9 +687,6 @@ export default class StateManager extends Container {
       }
       return beta;
     }
-
-    anpha;
-    beta;
   }
 
   public parstLocateArray(
