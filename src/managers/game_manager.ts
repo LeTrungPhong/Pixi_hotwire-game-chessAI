@@ -1,4 +1,4 @@
-import { Application, Container, Texture } from "pixi.js";
+import { Container, Texture } from "pixi.js";
 import BoardScene from "../scenes/board_scene";
 import { widthBoard } from "../common";
 import Knight from "../models/knight_piece";
@@ -24,7 +24,7 @@ export default class GameManager extends Container {
     private scaleScene: number;
     private boardScene: BoardScene;
 
-    constructor(textures: { name: string, src: Texture }[], app: Application<HTMLCanvasElement>) {
+    constructor(textures: { name: string, src: Texture }[]) {
         super();
 
         const textureBoard = textures.find(asset => asset.name === 'bouncing')?.src;
@@ -66,7 +66,7 @@ export default class GameManager extends Container {
         const blackRook_2 = new Rook("black_rook", -50, false, this.scaleScene, textures.find(assets => assets.name === 'black-rook')?.src);
 
         // create stateManager()
-        const stateManager = StateManager.getInstance(app);
+        const stateManager = StateManager.getInstance();
         stateManager.addState(0, 0, blackRook_1);
         stateManager.addState(0, 1, blackKnight_1);
         stateManager.addState(0, 2, blackBishop_1);
@@ -145,7 +145,7 @@ export default class GameManager extends Container {
         this.addChild(this.boardScene);
         // this.addChild(pieceManager)
 
-        const inputController = new InputController(this.scaleScene, app);
+        const inputController = new InputController(this.scaleScene);
         inputController.load();
         this.addChild(inputController);
         this.addChild(stateManager);

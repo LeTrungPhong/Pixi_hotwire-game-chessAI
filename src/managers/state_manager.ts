@@ -1,6 +1,7 @@
 import { Application, Container, Graphics } from "pixi.js";
 import { borderBoard, widthBoard, widthItem } from "../common";
 import Piece from "../models/piece_abstract";
+import { app } from "../index"
 
 export default class StateManager extends Container {
   private static instance: StateManager;
@@ -18,8 +19,16 @@ export default class StateManager extends Container {
   public blackKing?: { indexX: number; indexY: number };
   public moveValid: { indexX: number; indexY: number }[] = [];
   private app: Application<HTMLCanvasElement>;
+  private interpolation: {
+    piece: Piece
+    start: { x: number, y: number },
+    end: { x: number, y: number },
+    duration: number,
+    time: number,
+    check: boolean
+  }[] = []
 
-  constructor(app: Application<HTMLCanvasElement>) {
+  constructor() {
     super();
     this.app = app;
     const widthItem = (widthBoard - borderBoard * 2) / 8;
@@ -32,7 +41,7 @@ export default class StateManager extends Container {
           name: `${String.fromCharCode(97 + col)}${8 - row}`,
         },
         piece: null,
-        focus: null,
+        focus: null
       }))
     );
   }
@@ -41,6 +50,33 @@ export default class StateManager extends Container {
   // minimax // phong, duc, trung
   // func gia lap (board state, quan co dang xet) => danh sach ban co moi // trung
   // func cap nhat lai trang thai (board state)
+
+  public update(deltaTime: number) {
+    // console.log(this.interpolation)
+    this.interpolation.forEach((item) => {
+      // console.log("Check inter")
+      item.time += deltaTime;
+      let t = Math.min(item.time / item.duration, 1);
+
+      item.piece.x = this.lerp(item.start.x, item.end.x, t);
+      item.piece.y = this.lerp(item.start.y, item.end.y, t);
+
+      if (t == 1) {
+        item.check = false;
+      }
+    })
+
+    for(let i: number = 0; i < this.interpolation.length; ++i) {
+      if (this.interpolation[i].check == false) {
+        this.interpolation.splice(i, 1);
+      }
+      // console.log(this.interpolation[i] + " " + deltaTime)
+    }
+  }
+
+  public lerp(start: number, end: number, t: number) {
+    return start + (end - start) * t;
+  }
 
   public addState(row: number, column: number, piece: Piece) {
     this.boardState[row][column].piece = piece;
@@ -80,9 +116,9 @@ export default class StateManager extends Container {
     });
   }
 
-  public static getInstance(app: Application<HTMLCanvasElement>): StateManager {
+  public static getInstance(): StateManager {
     if (!StateManager.instance) {
-      StateManager.instance = new StateManager(app);
+      StateManager.instance = new StateManager();
     }
     return StateManager.instance;
   }
@@ -116,7 +152,6 @@ export default class StateManager extends Container {
         );
         this.boardState[indexX][indexY].focus = rect;
         this.addChild(rect);
-  
         
         if (piece) {
           const listMovePiece = piece.move(this.boardState, indexX, indexY);
@@ -148,6 +183,7 @@ export default class StateManager extends Container {
         (indexX !== this.move?.indexX || indexY !== this.move?.indexY) &&
         this.move != undefined
       ) {
+        // InputController.getInstance(0).removeMouseDownEvent();
         const focus = this.boardState[indexX][indexY].focus;
         if (focus) {
           this.movePiece(this.boardState, this.move, indexX, indexY);
@@ -172,13 +208,16 @@ export default class StateManager extends Container {
                 player
               )
             );
-            this.movePiece(
-              this.boardState,
-              this.moveAI?.start,
-              this.moveAI?.end.indexX || 0,
-              this.moveAI?.end.indexY || 0
-            );
-          }, 100);
+            setTimeout(() => {
+              this.movePiece(
+                this.boardState,
+                this.moveAI?.start,
+                this.moveAI?.end.indexX || 0,
+                this.moveAI?.end.indexY || 0
+              );
+            }, 500);
+            this.app.renderer.render(this.app.stage); // check
+          }, 500);
         }
       }
       this.boardState.forEach((row) => {
@@ -246,13 +285,48 @@ export default class StateManager extends Container {
         rookOffset = startY > destY ? -1 : 1;
         boardState[destX][destY + moveOffset].piece = capturedPiece;
         boardState[startX][destY + moveOffset + rookOffset].piece = piece;
+
+        this.interpolation.push({
+          piece: piece,
+          start: { x: boardState[startX][startY].post.x, y: boardState[startX][startY].post.y },
+          end: { x: boardState[startX][destY + moveOffset + rookOffset].post.x, y: boardState[startX][destY + moveOffset + rookOffset].post.y },
+          duration: 0.5,
+          time: 0,
+          check: true
+        });
+
+        this.interpolation.push({
+          piece: capturedPiece,
+          start: { x: boardState[destX][destY].post.x, y: boardState[destX][destY].post.y },
+          end: { x: boardState[startX][destY + moveOffset].post.x, y: boardState[startX][destY + moveOffset].post.y },
+          duration: 0.5,
+          time: 0,
+          check: true
+        });
       } else {
         // Quân vua nhập thành
         moveOffset = startY > destY ? -2 : 2;
         rookOffset = startY > destY ? 1 : -1;
         boardState[destX][startY + moveOffset].piece = piece;
-        boardState[startX][startY + moveOffset + rookOffset].piece =
-          capturedPiece;
+        boardState[startX][startY + moveOffset + rookOffset].piece = capturedPiece;
+
+        this.interpolation.push({
+          piece: piece,
+          start: { x: boardState[startX][startY].post.x, y: boardState[startX][startY].post.y },
+          end: { x: boardState[destX][startY + moveOffset].post.x, y: boardState[destX][startY + moveOffset].post.y },
+          duration: 0.5,
+          time: 0,
+          check: true
+        });
+
+        this.interpolation.push({
+          piece: capturedPiece,
+          start: { x: boardState[destX][destY].post.x, y: boardState[destX][destY].post.y },
+          end: { x: boardState[startX][startY + moveOffset + rookOffset].post.x, y: boardState[startX][startY + moveOffset + rookOffset].post.y },
+          duration: 0.5,
+          time: 0,
+          check: true
+        });
       }
       boardState[startX][startY].piece = null;
       boardState[destX][destY].piece = null;
@@ -261,12 +335,22 @@ export default class StateManager extends Container {
       if (capturedPiece) {
         this.removeChild(capturedPiece);
       }
-      boardState[destX][destY].piece = piece;
       boardState[startX][startY].piece = null;
+      boardState[destX][destY].piece = piece;
+
+      this.interpolation.push({
+        piece: piece,
+        start: { x: boardState[startX][startY].post.x, y: boardState[startX][startY].post.y },
+        end: { x: boardState[destX][destY].post.x, y: boardState[destX][destY].post.y },
+        duration: 0.5,
+        time: 0,
+        check: true
+      });
     }
+
     piece.setMoved(true);
 
-    this.setPost(boardState);
+    // this.setPost(boardState);
 
     if (piece.getValue() == 900) {
       this.whiteKing = { indexX: destX, indexY: destY };

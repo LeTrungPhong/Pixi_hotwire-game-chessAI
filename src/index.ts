@@ -1,8 +1,9 @@
 import { Application, Assets } from "pixi.js";
 import GameManager from "./managers/game_manager";
 import { heightBoard, widthBoard } from "./common";
+import StateManager from "./managers/state_manager";
 
-const app = new Application<HTMLCanvasElement>({
+export const app = new Application<HTMLCanvasElement>({
     view: document.getElementById("pixi-canvas") as HTMLCanvasElement,
     resolution: window.devicePixelRatio || 1,
     autoDensity: true,
@@ -50,11 +51,14 @@ async function loadAssets() {
 
         app.renderer.resize(widthBoard, heightBoard);
 
-        const engineGame = new GameManager(textures, app)
-
+        const engineGame = new GameManager(textures);
         // engineGame.show()
 
         // console.log(engineGame.getPositiveMoveAt(3, 4))
+
+        app.ticker.add(() => {
+            StateManager.getInstance().update(1 / app.ticker.FPS);
+        })
 
 
         app.stage.addChild(engineGame);
@@ -64,13 +68,6 @@ async function loadAssets() {
 }
 
 loadAssets().catch(console.error);
-
-app.ticker.add(() => {
-    // const deltaSeconds = deltaTime / app.ticker.FPS;
-    // console.log(deltaTime);
-    // console.log(app.ticker.FPS);
-    // sceny.update(1 / app.ticker.FPS);
-})
 
 
 
