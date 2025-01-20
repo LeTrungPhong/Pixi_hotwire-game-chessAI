@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Application, Container, Graphics } from "pixi.js";
 import { borderBoard, widthBoard, widthItem } from "../common";
 import Piece from "../models/piece_abstract";
 
@@ -16,9 +16,12 @@ export default class StateManager extends Container {
   };
   public whiteKing?: { indexX: number; indexY: number };
   public blackKing?: { indexX: number; indexY: number };
+  public moveValid: { indexX: number; indexY: number }[] = [];
+  private app: Application<HTMLCanvasElement>;
 
-  constructor() {
+  constructor(app: Application<HTMLCanvasElement>) {
     super();
+    this.app = app;
     const widthItem = (widthBoard - borderBoard * 2) / 8;
 
     this.boardState = Array.from({ length: 8 }, (_, row) =>
@@ -77,23 +80,14 @@ export default class StateManager extends Container {
     });
   }
 
-  public static getInstance(): StateManager {
+  public static getInstance(app: Application<HTMLCanvasElement>): StateManager {
     if (!StateManager.instance) {
-      StateManager.instance = new StateManager();
+      StateManager.instance = new StateManager(app);
     }
     return StateManager.instance;
   }
 
   public updateFocus(indexX: number, indexY: number) {
-    this.boardState.forEach((row) => {
-      row.forEach((item) => {
-        if (item.focus) {
-          this.removeChild(item.focus);
-          item.focus = null;
-        }
-      });
-    });
-
     if (
       this.move == undefined &&
       indexX >= 0 &&
@@ -102,72 +96,99 @@ export default class StateManager extends Container {
       indexY < this.boardState[indexX]?.length &&
       this.boardState[indexX]?.[indexY]?.piece != null
     ) {
-      const rect = new Graphics();
-      rect.lineStyle(2, 0xff0000);
-      rect.drawRect(
-        this.boardState[indexX][indexY].post.x - widthItem / 2,
-        this.boardState[indexX][indexY].post.y - widthItem / 2,
-        widthItem,
-        widthItem
-      );
-      this.boardState[indexX][indexY].focus = rect;
-      this.addChild(rect);
-
       const piece = this.boardState[indexX][indexY].piece;
-      if (piece) {
-        const listMovePiece = piece.move(this.boardState, indexX, indexY);
-        // console.log(listMovePiece);
-
-        listMovePiece.forEach((item) => {
-          const indexX = item?.indexX;
-          const indexY = item?.indexY;
-          if (indexX != null && indexY != null) {
-            const rect = new Graphics();
-            rect.lineStyle(2, 0xff0000);
-            rect.drawRect(
-              this.boardState[indexX][indexY].post.x - widthItem / 2,
-              this.boardState[indexX][indexY].post.y - widthItem / 2,
-              widthItem,
-              widthItem
-            );
-            this.boardState[indexX][indexY].focus = rect;
-            this.addChild(rect);
-          }
+      if (piece && piece.getValue() > 0) {
+        this.boardState.forEach((row) => {
+          row.forEach((item) => {
+            if (item.focus) {
+              this.removeChild(item.focus);
+              item.focus = null;
+            }
+          });
         });
+        const rect = new Graphics();
+        rect.lineStyle(2, 0xff0000);
+        rect.drawRect(
+          this.boardState[indexX][indexY].post.x - widthItem / 2,
+          this.boardState[indexX][indexY].post.y - widthItem / 2,
+          widthItem,
+          widthItem
+        );
+        this.boardState[indexX][indexY].focus = rect;
+        this.addChild(rect);
+  
+        
+        if (piece) {
+          const listMovePiece = piece.move(this.boardState, indexX, indexY);
+            this.moveValid = listMovePiece;
+            // console.log(listMovePiece);
+  
+            listMovePiece.forEach((item) => {
+              const indexX = item?.indexX;
+              const indexY = item?.indexY;
+              if (indexX != null && indexY != null) {
+                const rect = new Graphics();
+                rect.lineStyle(2, 0xff0000);
+                rect.drawRect(
+                  this.boardState[indexX][indexY].post.x - widthItem / 2,
+                  this.boardState[indexX][indexY].post.y - widthItem / 2,
+                  widthItem,
+                  widthItem
+                );
+                this.boardState[indexX][indexY].focus = rect;
+                this.addChild(rect);
+              }
+            });
+        }
+  
+        this.move = { indexX: indexX, indexY: indexY };
       }
-
-      this.move = { indexX: indexX, indexY: indexY };
     } else {
       if (
         (indexX !== this.move?.indexX || indexY !== this.move?.indexY) &&
         this.move != undefined
       ) {
-        this.movePiece(this.boardState, this.move, indexX, indexY);
-        const boardStateCopy = this.copyBoardState(this.boardState);
-        const computer: Piece[] = [];
-        const player: Piece[] = [];
-        this.copyListPiece(boardStateCopy, computer, player);
-        // console.log(boardStateCopy)
-        this.setPost(boardStateCopy);
-        console.log(
-          this.minimax(
-            boardStateCopy,
-            100000,
-            -100000,
-            3,
-            3,
-            true,
-            computer,
-            player
-          )
-        );
-        this.movePiece(
-          this.boardState,
-          this.moveAI?.start,
-          this.moveAI?.end.indexX || 0,
-          this.moveAI?.end.indexY || 0
-        );
+        const focus = this.boardState[indexX][indexY].focus;
+        if (focus) {
+          this.movePiece(this.boardState, this.move, indexX, indexY);
+          this.app.renderer.render(this.app.stage); // check
+          console.log("Check player move")
+          setTimeout(() => {
+            const boardStateCopy = this.copyBoardState(this.boardState);
+            const computer: Piece[] = [];
+            const player: Piece[] = [];
+            this.copyListPiece(boardStateCopy, computer, player);
+            // console.log(boardStateCopy)
+            this.setPost(boardStateCopy);
+            console.log(
+              this.minimax(
+                boardStateCopy,
+                100000,
+                -100000,
+                3,
+                3,
+                true,
+                computer,
+                player
+              )
+            );
+            this.movePiece(
+              this.boardState,
+              this.moveAI?.start,
+              this.moveAI?.end.indexX || 0,
+              this.moveAI?.end.indexY || 0
+            );
+          }, 100);
+        }
       }
+      this.boardState.forEach((row) => {
+        row.forEach((item) => {
+          if (item.focus) {
+            this.removeChild(item.focus);
+            item.focus = null;
+          }
+        });
+      });
 
       this.move = undefined;
     }
@@ -642,22 +663,22 @@ export default class StateManager extends Container {
           row.flatMap((item) => {
             if (item.piece && item.piece.getValue() < 0) {
               const position = this.parstLocateArray(item.post.x, item.post.y);
-              console.log("begin");
+              // console.log("begin");
               var legalMove = item.piece.move(
                 boardState,
                 position.indexX,
                 position.indexY
               );
-              console.log(legalMove);
-              console.log("end");
+              // console.log(legalMove);
+              // console.log("end");
               legalMove = this.isMoveValidAgainstCheck(
                 legalMove,
                 position,
                 isWhiteTurn,
                 KingPosition
               );
-              console.log("end2");
-              console.log(legalMove);
+              // console.log("end2");
+              // console.log(legalMove);
               return legalMove;
             }
             return [];
@@ -795,13 +816,13 @@ export default class StateManager extends Container {
       focus: Graphics | null;
     }[][]
   ): boolean {
-    console.log(KingPosition);
+    // console.log(KingPosition);
     let legalMove = this.getAllPosibleMove(
       boardState,
       isWhiteTurn,
       KingPosition
     );
-    console.log(legalMove);
+    // console.log(legalMove);
     if (legalMove.length == 0) {
       return true;
     }

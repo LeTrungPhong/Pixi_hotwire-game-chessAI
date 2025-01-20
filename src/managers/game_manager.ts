@@ -66,7 +66,7 @@ export default class GameManager extends Container {
         const blackRook_2 = new Rook("black_rook", -50, false, this.scaleScene, textures.find(assets => assets.name === 'black-rook')?.src);
 
         // create stateManager()
-        const stateManager = StateManager.getInstance();
+        const stateManager = StateManager.getInstance(app);
         stateManager.addState(0, 0, blackRook_1);
         stateManager.addState(0, 1, blackKnight_1);
         stateManager.addState(0, 2, blackBishop_1);
@@ -155,11 +155,11 @@ export default class GameManager extends Container {
         this.scaleScene
     }
 
-    public show() {
-        StateManager.getInstance().show();
-    }
+    // public show() {
+    //     StateManager.getInstance().show();
+    // }
 
-    public getPositiveMoveAt(X: number, Y: number) : { indexX: number; indexY: number; }[]{
-        return StateManager.getInstance().getPositiveMoveAt(X, Y);
-    }
+    // public getPositiveMoveAt(X: number, Y: number) : { indexX: number; indexY: number; }[]{
+    //     return StateManager.getInstance().getPositiveMoveAt(X, Y);
+    // }
 }

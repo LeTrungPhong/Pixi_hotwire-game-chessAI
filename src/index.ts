@@ -52,7 +52,7 @@ async function loadAssets() {
 
         const engineGame = new GameManager(textures, app)
 
-        engineGame.show()
+        // engineGame.show()
 
         // console.log(engineGame.getPositiveMoveAt(3, 4))
 

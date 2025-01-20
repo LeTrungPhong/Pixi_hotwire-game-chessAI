@@ -16,7 +16,7 @@ export default class InputController extends Container {
         this.app = app;
         this.scaleScene = scaleScene;
         this.pieceManager = PieceManager.getInstance();
-        this.stateManager = StateManager.getInstance();
+        this.stateManager = StateManager.getInstance(app);
     }
 
     public update(delta: number) {
@@ -44,8 +44,6 @@ export default class InputController extends Container {
                 for (let i: number = 0; i < this.stateManager.boardState.length; ++i) {
                     for (let j: number = 0; j < this.stateManager.boardState[i].length; ++j) {
 
-                        
-                        
                     }
                 }
 
