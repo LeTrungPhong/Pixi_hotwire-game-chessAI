@@ -698,6 +698,8 @@ export default class StateManager extends Container {
               }
             };
           }
+        } else if (anpha <= beta) {
+          return anpha;
         }
 
         
@@ -742,7 +744,11 @@ export default class StateManager extends Container {
             selectDepth,
             true
           );
-          beta = Math.max(beta, scoreNew);
+         if (beta < scoreNew) {
+          beta = scoreNew;
+         } else if (anpha <= beta) {
+          return beta;
+         }
           // console.log("player, " + "score: " + score, "depth: " + depth);
         }
       }
