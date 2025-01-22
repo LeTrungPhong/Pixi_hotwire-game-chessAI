@@ -646,63 +646,61 @@ export default class StateManager extends Container {
     });
 
     if (depth == 0 || checkKingComputer == false || checkKingPlayer == false) {
+      console.log(1);
       return this.valueCal(boardState);
     }
 
     // turn computer
     if (turn) {
-      for (let i: number = 0; i < computer.length; ++i) {
-        const indexX = Math.floor((computer[i].y - borderBoard) / widthItem);
-        const indexY = Math.floor((computer[i].x - borderBoard) / widthItem);
-        // if (indexX < 0 || indexY < 0) console.log(computer[i].y + " " + computer[i].x)
-        const validMove = computer[i].move(boardState, indexX, indexY);
+      
+      const boardStateCopy = this.copyBoardState(boardState);
+        const mapMinimax = this.minimaxDepth2(
+          boardStateCopy,
+          100000,
+          -100000,
+          2,
+          2,
+          true);
 
-        validMove.forEach((item) => {
-          if (
-            item.indexX < 0 ||
-            item.indexY < 0 ||
-            item.indexX > 7 ||
-            item.indexY > 7
-          ) {
-            console.log("x: " + item.indexX + ", y: " + item.indexY);
+      mapMinimax.sort((a: any, b: any) => a.score - b.score);
+
+      // console.log(mapMinimax)
+
+      for (let i: number = 0; i < mapMinimax.length; ++i) {
+        const boardStateCopy = this.copyBoardState(boardState);
+        const playerCopy: Piece[] = [];
+        const computerCopy: Piece[] = [];
+        this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
+        this.movePieceAI(
+          boardStateCopy,
+          { indexX: mapMinimax[i].post.indexX, indexY: mapMinimax[i].post.indexY },
+          mapMinimax[i].move.indexX,
+          mapMinimax[i].move.indexY
+        );
+
+        const scoreNew: number = this.minimax(
+          boardStateCopy,
+          anpha,
+          beta,
+          depth - 1,
+          selectDepth,
+          false
+        );
+        if (anpha > scoreNew) {
+          anpha = scoreNew;
+
+          if (depth == selectDepth) {
+            this.moveAI = {
+              start: { indexX: mapMinimax[i].post.indexX, indexY: mapMinimax[i].post.indexY },
+              end: {
+                indexX: mapMinimax[i].move.indexX,
+                indexY: mapMinimax[i].move.indexY
+              }
+            };
           }
-        });
-
-        for (let j: number = 0; j < validMove.length; ++j) {
-          const boardStateCopy = this.copyBoardState(boardState);
-          const playerCopy: Piece[] = [];
-          const computerCopy: Piece[] = [];
-          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-          this.movePieceAI(
-            boardStateCopy,
-            { indexX: indexX, indexY: indexY },
-            validMove[j].indexX,
-            validMove[j].indexY
-          );
-
-          const scoreNew: number = this.minimax(
-            boardStateCopy,
-            anpha,
-            beta,
-            depth - 1,
-            selectDepth,
-            false
-          );
-          if (anpha > scoreNew) {
-            anpha = scoreNew;
-
-            if (depth == selectDepth) {
-              this.moveAI = {
-                start: { indexX: indexX, indexY: indexY },
-                end: {
-                  indexX: validMove[j].indexX,
-                  indexY: validMove[j].indexY,
-                },
-              };
-            }
-          }
-          // console.log("computer, " + "score: " + score, "depth: " + depth);
         }
+
+        
       }
       return anpha;
     } else {
@@ -751,6 +749,136 @@ export default class StateManager extends Container {
       return beta;
     }
   }
+
+  public minimaxDepth2(
+    boardState: any,
+    anpha: number,
+    beta: number,
+    depth: number,
+    selectDepth: number,
+    turn: boolean,
+  ): any {
+    const mapMinimax: {
+      score: number,
+      piece: Piece,
+      post: {
+        indexX: number,
+        indexY: number
+      }
+      move: {
+        indexX: number,
+        indexY: number
+      }
+    }[] = [];
+
+    let checkKingComputer: boolean = false;
+    let checkKingPlayer: boolean = false;
+    const computer: Piece[] = [];
+    const player: Piece[] = [];
+    this.copyListPiece(boardState, computer, player);
+    // check king computer
+    computer.forEach((item) => {
+      if (item.getValue() == -900) {
+        checkKingComputer = true;
+      }
+    });
+    // check king player
+    player.forEach((item) => {
+      if (item.getValue() == 900) {
+        checkKingPlayer = true;
+      }
+    });
+
+    if (depth == 0 || checkKingComputer == false || checkKingPlayer == false) {
+      return this.valueCal(boardState);
+    }
+
+    // turn computer
+    if (turn) {
+      for (let i: number = 0; i < computer.length; ++i) {
+        const indexX = Math.floor((computer[i].y - borderBoard) / widthItem);
+        const indexY = Math.floor((computer[i].x - borderBoard) / widthItem);
+        const validMove = computer[i].move(boardState, indexX, indexY);
+
+        for (let j: number = 0; j < validMove.length; ++j) {
+          const boardStateCopy = this.copyBoardState(boardState);
+          const playerCopy: Piece[] = [];
+          const computerCopy: Piece[] = [];
+          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
+          this.movePieceAI(
+            boardStateCopy,
+            { indexX: indexX, indexY: indexY },
+            validMove[j].indexX,
+            validMove[j].indexY
+          );
+
+          const scoreNew: number = this.minimaxDepth2(
+            boardStateCopy,
+            anpha,
+            beta,
+            depth - 1,
+            selectDepth,
+            false
+          );
+
+          if (depth == 2) {
+            mapMinimax.push({
+              score: scoreNew,
+              piece: computer[i],
+              post: {
+                indexX,
+                indexY
+              },
+              move: {
+                indexX: validMove[j].indexX,
+                indexY: validMove[j].indexY
+              }
+            });
+          }
+
+          if (anpha > scoreNew) {
+            anpha = scoreNew;
+          }
+        }
+      }
+      if (depth == 2) {
+        return mapMinimax;
+      } else {
+        return anpha;
+      }
+    } else {
+      for (let i: number = 0; i < player.length; ++i) {
+        const indexX = Math.floor((player[i].y - borderBoard) / widthItem);
+        const indexY = Math.floor((player[i].x - borderBoard) / widthItem);
+        const validMove = player[i].move(boardState, indexX, indexY);
+
+        for (let j: number = 0; j < validMove.length; ++j) {
+          const boardStateCopy = this.copyBoardState(boardState);
+          const playerCopy: Piece[] = [];
+          const computerCopy: Piece[] = [];
+          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
+          this.movePieceAI(
+            boardStateCopy,
+            { indexX: indexX, indexY: indexY },
+            validMove[j].indexX,
+            validMove[j].indexY
+          );
+
+          const scoreNew: number = this.minimaxDepth2(
+            boardStateCopy,
+            anpha,
+            beta,
+            depth - 1,
+            selectDepth,
+            true
+          );
+          beta = Math.max(beta, scoreNew);
+        }
+      }
+      return beta;
+    }
+  }
+
 
   public parstLocateArray(
     postX: number,
