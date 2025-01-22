@@ -215,8 +215,8 @@ export default class StateManager extends Container {
                 boardStateCopy,
                 100000,
                 -100000,
-                3,
-                3,
+                4,
+                4,
                 true
               )
             );
@@ -700,9 +700,9 @@ export default class StateManager extends Container {
                 indexY: mapMinimax[i].move.indexY
               }
             };
-          } else if (anpha <= beta) {
-            return anpha;
-          }
+          } 
+        } else if (anpha <= beta) {
+          return anpha;
         }
       }
       return anpha;
@@ -745,7 +745,6 @@ export default class StateManager extends Container {
             selectDepth,
             true
           );
-          beta = Math.max(beta, scoreNew);
 
           if (beta < scoreNew) {
             beta = scoreNew;
