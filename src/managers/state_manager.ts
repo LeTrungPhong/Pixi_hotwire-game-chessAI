@@ -28,6 +28,18 @@ export default class StateManager extends Container {
     check: boolean
   }[] = []
 
+  private pawnEvalWhite = [0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0,  0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5, 0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0,  0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5,  0.5,  1.0, 1.0,  -2.0, -2.0,  1.0,  1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0]
+  private knightEval = [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0,  -4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0,  -3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0,  -3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0,  -3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0,  -3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0,  -4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0,  -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0]
+  private bishopEvalWhite = [ -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0,  -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0,  -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0,  -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0,  -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0,  -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0,  -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0]
+  private rookEvalWhite = [  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5,  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,  0.0,   0.0, 0.0,  0.5,  0.5,  0.0,  0.0,  0.0]
+  private kingEvalWhite = [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,  -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0,  -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0,  2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0,  2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0]
+  private evalQueen = [ -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0,  -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0,  -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0,  -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5,  0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5,  -1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0,  -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0,  -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0]
+  
+  public pawnEvalBlack: number[] = [];
+  public bishopEvalBlack: number[] = [];
+  public rookEvalBlack: number[] = [];
+  public kingEvalBlack: number[] = [];
+
   constructor() {
     super();
     this.app = app;
@@ -44,6 +56,11 @@ export default class StateManager extends Container {
         focus: null
       }))
     );
+
+    this.pawnEvalBlack = this.reverseArray(this.pawnEvalWhite);
+    this.bishopEvalBlack = this.reverseArray(this.bishopEvalWhite);
+    this.rookEvalBlack = this.reverseArray(this.rookEvalWhite);
+    this.kingEvalBlack = this.reverseArray(this.kingEvalWhite);
   }
 
   // func lay danh sách bên trắng, bên đen (turn) => quân cờ // trung
@@ -198,8 +215,8 @@ export default class StateManager extends Container {
                 boardStateCopy,
                 100000,
                 -100000,
-                4,
-                4,
+                3,
+                3,
                 true
               )
             );
@@ -536,6 +553,10 @@ export default class StateManager extends Container {
     return positiveMove;
   }
 
+  public reverseArray(array: number[]) {
+    return array.slice().reverse();
+  };
+
   public valueCal(
     boardState: {
       post: { x: number; y: number; name: string };
@@ -544,10 +565,52 @@ export default class StateManager extends Container {
     }[][]
   ): number {
     let sum: number = 0;
-    boardState.forEach((row) => {
-      row.forEach((item) => {
+    boardState.forEach((row, indexX) => {
+      row.forEach((item, indexY) => {
         if (item.piece) {
-          sum += item.piece.getValue();
+          const index = 8 * indexX + indexY;
+          let score = 0;
+          switch (item.piece.getValue()) {
+            case 10:
+              score = this.pawnEvalWhite[index];
+              break;
+            case 30:
+              score = this.knightEval[index];
+              break;
+            case 45:
+              score = this.bishopEvalWhite[index];
+              break;
+            case 50:
+              score = this.rookEvalWhite[index];
+              break;
+            case 90:
+              score = this.evalQueen[index];
+              break;
+            case 900:
+              score = this.kingEvalWhite[index];
+              break;
+            case -10:
+              score = -this.pawnEvalBlack[index];
+              break;
+            case -30:
+              score = -this.knightEval[index];
+              break;
+            case -45:
+              score = -this.bishopEvalBlack[index];
+              break;
+            case -50:
+              score = -this.rookEvalBlack[index];
+              break;
+            case -90:
+              score = -this.evalQueen[index];
+              break;
+            case -900:
+              score = -this.kingEvalBlack[index];
+              break;
+            default:
+              break;
+          }
+          sum += (item.piece.getValue() + score);
         }
       });
     });
@@ -588,54 +651,58 @@ export default class StateManager extends Container {
 
     // turn computer
     if (turn) {
-      const boardStateCopy = this.copyBoardState(boardState);
-        const mapMinimax = this.minimaxDepth2(
-          boardStateCopy,
-          100000,
-          -100000,
-          2,
-          2,
-          true);
+      for (let i: number = 0; i < computer.length; ++i) {
+        const indexX = Math.floor((computer[i].y - borderBoard) / widthItem);
+        const indexY = Math.floor((computer[i].x - borderBoard) / widthItem);
+        // if (indexX < 0 || indexY < 0) console.log(computer[i].y + " " + computer[i].x)
+        const validMove = computer[i].move(boardState, indexX, indexY);
 
-      mapMinimax.sort((a: any, b: any) => a.score - b.score);
-
-      console.log(mapMinimax)
-
-      for (let i: number = 0; i < mapMinimax.length; ++i) {
-        const boardStateCopy = this.copyBoardState(boardState);
-        const playerCopy: Piece[] = [];
-        const computerCopy: Piece[] = [];
-        this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-        this.movePieceAI(
-          boardStateCopy,
-          { indexX: mapMinimax[i].post.indexX, indexY: mapMinimax[i].post.indexY },
-          mapMinimax[i].move.indexX,
-          mapMinimax[i].move.indexY
-        );
-
-        const scoreNew: number = this.minimax(
-          boardStateCopy,
-          anpha,
-          beta,
-          depth - 1,
-          selectDepth,
-          false
-        );
-        if (anpha > scoreNew) {
-          anpha = scoreNew;
-
-          if (depth == selectDepth) {
-            this.moveAI = {
-              start: { indexX: mapMinimax[i].post.indexX, indexY: mapMinimax[i].post.indexY },
-              end: {
-                indexX: mapMinimax[i].move.indexX,
-                indexY: mapMinimax[i].move.indexY
-              }
-            };
+        validMove.forEach((item) => {
+          if (
+            item.indexX < 0 ||
+            item.indexY < 0 ||
+            item.indexX > 7 ||
+            item.indexY > 7
+          ) {
+            console.log("x: " + item.indexX + ", y: " + item.indexY);
           }
-        }
+        });
 
-        
+        for (let j: number = 0; j < validMove.length; ++j) {
+          const boardStateCopy = this.copyBoardState(boardState);
+          const playerCopy: Piece[] = [];
+          const computerCopy: Piece[] = [];
+          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
+          this.movePieceAI(
+            boardStateCopy,
+            { indexX: indexX, indexY: indexY },
+            validMove[j].indexX,
+            validMove[j].indexY
+          );
+
+          const scoreNew: number = this.minimax(
+            boardStateCopy,
+            anpha,
+            beta,
+            depth - 1,
+            selectDepth,
+            false
+          );
+          if (anpha > scoreNew) {
+            anpha = scoreNew;
+
+            if (depth == selectDepth) {
+              this.moveAI = {
+                start: { indexX: indexX, indexY: indexY },
+                end: {
+                  indexX: validMove[j].indexX,
+                  indexY: validMove[j].indexY,
+                },
+              };
+            }
+          }
+          // console.log("computer, " + "score: " + score, "depth: " + depth);
+        }
       }
       return anpha;
     } else {
@@ -679,135 +746,6 @@ export default class StateManager extends Container {
           );
           beta = Math.max(beta, scoreNew);
           // console.log("player, " + "score: " + score, "depth: " + depth);
-        }
-      }
-      return beta;
-    }
-  }
-
-  public minimaxDepth2(
-    boardState: any,
-    anpha: number,
-    beta: number,
-    depth: number,
-    selectDepth: number,
-    turn: boolean,
-  ): any {
-    const mapMinimax: {
-      score: number,
-      piece: Piece,
-      post: {
-        indexX: number,
-        indexY: number
-      }
-      move: {
-        indexX: number,
-        indexY: number
-      }
-    }[] = [];
-
-    let checkKingComputer: boolean = false;
-    let checkKingPlayer: boolean = false;
-    const computer: Piece[] = [];
-    const player: Piece[] = [];
-    this.copyListPiece(boardState, computer, player);
-    // check king computer
-    computer.forEach((item) => {
-      if (item.getValue() == -900) {
-        checkKingComputer = true;
-      }
-    });
-    // check king player
-    player.forEach((item) => {
-      if (item.getValue() == 900) {
-        checkKingPlayer = true;
-      }
-    });
-
-    if (depth == 0 || checkKingComputer == false || checkKingPlayer == false) {
-      return this.valueCal(boardState);
-    }
-
-    // turn computer
-    if (turn) {
-      for (let i: number = 0; i < computer.length; ++i) {
-        const indexX = Math.floor((computer[i].y - borderBoard) / widthItem);
-        const indexY = Math.floor((computer[i].x - borderBoard) / widthItem);
-        const validMove = computer[i].move(boardState, indexX, indexY);
-
-        for (let j: number = 0; j < validMove.length; ++j) {
-          const boardStateCopy = this.copyBoardState(boardState);
-          const playerCopy: Piece[] = [];
-          const computerCopy: Piece[] = [];
-          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-          this.movePieceAI(
-            boardStateCopy,
-            { indexX: indexX, indexY: indexY },
-            validMove[j].indexX,
-            validMove[j].indexY
-          );
-
-          const scoreNew: number = this.minimaxDepth2(
-            boardStateCopy,
-            anpha,
-            beta,
-            depth - 1,
-            selectDepth,
-            false
-          );
-
-          if (depth == 2) {
-            mapMinimax.push({
-              score: scoreNew,
-              piece: computer[i],
-              post: {
-                indexX,
-                indexY
-              },
-              move: {
-                indexX: validMove[j].indexX,
-                indexY: validMove[j].indexY
-              }
-            });
-          }
-
-          if (anpha > scoreNew) {
-            anpha = scoreNew;
-          }
-        }
-      }
-      if (depth == 2) {
-        return mapMinimax;
-      } else {
-        return anpha;
-      }
-    } else {
-      for (let i: number = 0; i < player.length; ++i) {
-        const indexX = Math.floor((player[i].y - borderBoard) / widthItem);
-        const indexY = Math.floor((player[i].x - borderBoard) / widthItem);
-        const validMove = player[i].move(boardState, indexX, indexY);
-
-        for (let j: number = 0; j < validMove.length; ++j) {
-          const boardStateCopy = this.copyBoardState(boardState);
-          const playerCopy: Piece[] = [];
-          const computerCopy: Piece[] = [];
-          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-          this.movePieceAI(
-            boardStateCopy,
-            { indexX: indexX, indexY: indexY },
-            validMove[j].indexX,
-            validMove[j].indexY
-          );
-
-          const scoreNew: number = this.minimaxDepth2(
-            boardStateCopy,
-            anpha,
-            beta,
-            depth - 1,
-            selectDepth,
-            true
-          );
-          beta = Math.max(beta, scoreNew);
         }
       }
       return beta;
