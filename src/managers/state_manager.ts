@@ -653,13 +653,13 @@ export default class StateManager extends Container {
     // turn computer
     if (turn) {
       const boardStateCopy = this.copyBoardState(boardState);
-        const mapMinimax = this.minimaxDepth2(
-          boardStateCopy,
-          100000,
-          -100000,
-          2,
-          2,
-          true);
+      const mapMinimax = this.minimaxDepth2(
+        boardStateCopy,
+        100000,
+        -100000,
+        2,
+        2,
+        true);
 
       mapMinimax.sort((a: any, b: any) => a.score - b.score);
 
@@ -701,7 +701,9 @@ export default class StateManager extends Container {
               }
             };
           } 
-        } else if (anpha <= beta) {
+        }
+
+        if (anpha <= beta) {
           return anpha;
         }
       }
@@ -748,7 +750,9 @@ export default class StateManager extends Container {
 
           if (beta < scoreNew) {
             beta = scoreNew;
-          } else if (anpha <= beta) {
+          } 
+
+          if (anpha <= beta) {
             return beta;
           }
           // console.log("player, " + "score: " + score, "depth: " + depth);
