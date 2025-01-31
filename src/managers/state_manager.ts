@@ -27,7 +27,6 @@ export default class StateManager extends Container {
         time: number;
         check: boolean;
     }[] = [];
-    public booleanState: boolean = true;
 
     private pawnEvalWhite = [
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0,
@@ -147,6 +146,22 @@ export default class StateManager extends Container {
     ) {
         boardState.forEach((row) => {
             row.forEach((item) => {
+                // const circle = new Graphics();
+                // const centerX = item.post.x ;
+                // const centerY = item.post.y ;
+
+                // circle.beginFill(0xff0000);
+                // circle.lineStyle(1, 0x000000);
+                // circle.drawCircle(0, 0, 2);
+
+                // circle.endFill();
+
+                // // Đặt vị trí cho circle
+                // circle.x = centerX;
+                // circle.y = centerY;
+
+                // this.addChild(circle)
+
                 if (item && item.piece) {
                     item.piece.x = item.post.x;
                     item.piece.y = item.post.y;
@@ -163,107 +178,16 @@ export default class StateManager extends Container {
     }
 
     public updateFocus(indexX: number, indexY: number) {
-        if (this.booleanState) {
-            if (
-                this.move == undefined &&
-                indexX >= 0 &&
-                indexX < this.boardState.length &&
-                indexY >= 0 &&
-                indexY < this.boardState[indexX]?.length &&
-                this.boardState[indexX]?.[indexY]?.piece != null
-            ) {
-                const piece = this.boardState[indexX][indexY].piece;
-                if (piece && piece.getValue() > 0) {
-                    this.boardState.forEach((row) => {
-                        row.forEach((item) => {
-                            if (item.focus) {
-                                this.removeChild(item.focus);
-                                item.focus = null;
-                            }
-                        });
-                    });
-                    const rect = new Graphics();
-                    rect.lineStyle(2, 0xff0000);
-                    rect.drawRect(
-                        this.boardState[indexX][indexY].post.x - widthItem / 2,
-                        this.boardState[indexX][indexY].post.y - widthItem / 2,
-                        widthItem,
-                        widthItem
-                    );
-                    this.boardState[indexX][indexY].focus = rect;
-                    this.addChild(rect);
-    
-                    if (piece) {
-                        const listMovePiece = piece.move(
-                            this.boardState,
-                            indexX,
-                            indexY
-                        );
-                        this.moveValid = listMovePiece;
-                        // console.log(listMovePiece);
-    
-                        listMovePiece.forEach((item) => {
-                            const indexX = item?.indexX;
-                            const indexY = item?.indexY;
-                            if (indexX != null && indexY != null) {
-                                const rect = new Graphics();
-                                rect.lineStyle(2, 0xff0000);
-                                rect.drawRect(
-                                    this.boardState[indexX][indexY].post.x -
-                                        widthItem / 2,
-                                    this.boardState[indexX][indexY].post.y -
-                                        widthItem / 2,
-                                    widthItem,
-                                    widthItem
-                                );
-                                this.boardState[indexX][indexY].focus = rect;
-                                this.addChild(rect);
-                            }
-                        });
-                    }
-    
-                    this.move = { indexX: indexX, indexY: indexY };
-                }
-            } else {
-                if (
-                    (indexX !== this.move?.indexX ||
-                        indexY !== this.move?.indexY) &&
-                    this.move != undefined
-                ) {
-                    // InputController.getInstance(0).removeMouseDownEvent();
-                    const focus = this.boardState[indexX][indexY].focus;
-                    if (focus) {
-                        this.movePiece(this.boardState, this.move, indexX, indexY);
-                        this.app.renderer.render(this.app.stage); // check
-                        // console.log("Check player move")
-                        setTimeout(() => {
-                            const boardStateCopy = this.copyBoardState(
-                                this.boardState
-                            );
-                            // console.log(boardStateCopy)
-                            this.setPost(boardStateCopy);
-                            console.log(
-                                this.minimax(
-                                    boardStateCopy,
-                                    100000,
-                                    -100000,
-                                    4,
-                                    4,
-                                    true
-                                )
-                            );
-                            setTimeout(() => {
-                                this.movePiece(
-                                    this.boardState,
-                                    this.moveAI?.start,
-                                    this.moveAI?.end.indexX || 0,
-                                    this.moveAI?.end.indexY || 0
-                                );
-                            }, 500);
-                            this.app.renderer.render(this.app.stage); // check
-                        }, 500);
-                    }
-                }
+        if (
+            this.move == undefined &&
+            indexX >= 0 &&
+            indexX < this.boardState.length &&
+            indexY >= 0 &&
+            indexY < this.boardState[indexX]?.length &&
+            this.boardState[indexX]?.[indexY]?.piece != null
+        ) {
+            const piece = this.boardState[indexX][indexY].piece;
+            if (piece && piece.getValue() > 0) {
                 this.boardState.forEach((row) => {
                     row.forEach((item) => {
                         if (item.focus) {
@@ -272,115 +196,100 @@ export default class StateManager extends Container {
                         }
                     });
                 });
-    
-                this.move = undefined;
-            }
-        }
-    }
-  public updateFocus(indexX: number, indexY: number) {
-    if (
-      this.move == undefined &&
-      indexX >= 0 &&
-      indexX < this.boardState.length &&
-      indexY >= 0 &&
-      indexY < this.boardState[indexX]?.length &&
-      this.boardState[indexX]?.[indexY]?.piece != null
-    ) {
-      const piece = this.boardState[indexX][indexY].piece;
-      if (piece && piece.getValue() > 0) {
-        this.boardState.forEach((row) => {
-          row.forEach((item) => {
-            if (item.focus) {
-              this.removeChild(item.focus);
-              item.focus = null;
-            }
-          });
-        });
-        const rect = new Graphics();
-        rect.lineStyle(2, 0xff0000);
-        rect.drawRect(
-          this.boardState[indexX][indexY].post.x - widthItem / 2,
-          this.boardState[indexX][indexY].post.y - widthItem / 2,
-          widthItem,
-          widthItem
-        );
-        this.boardState[indexX][indexY].focus = rect;
-        this.addChild(rect);
-        
-        if (piece) {
-          const listMovePiece = piece.move(this.boardState, indexX, indexY);
-            this.moveValid = listMovePiece;
-            // console.log(listMovePiece);
-  
-            listMovePiece.forEach((item) => {
-              const indexX = item?.indexX;
-              const indexY = item?.indexY;
-              if (indexX != null && indexY != null) {
                 const rect = new Graphics();
                 rect.lineStyle(2, 0xff0000);
                 rect.drawRect(
-                  this.boardState[indexX][indexY].post.x - widthItem / 2,
-                  this.boardState[indexX][indexY].post.y - widthItem / 2,
-                  widthItem,
-                  widthItem
+                    this.boardState[indexX][indexY].post.x - widthItem / 2,
+                    this.boardState[indexX][indexY].post.y - widthItem / 2,
+                    widthItem,
+                    widthItem
                 );
                 this.boardState[indexX][indexY].focus = rect;
                 this.addChild(rect);
-              }
-            });
-        }
-  
-        this.move = { indexX: indexX, indexY: indexY };
-      }
-    } else {
-      if (
-        (indexX !== this.move?.indexX || indexY !== this.move?.indexY) &&
-        this.move != undefined
-      ) {
-        // InputController.getInstance(0).removeMouseDownEvent();
-        const focus = this.boardState[indexX][indexY].focus;
-        if (focus) {
-          this.movePiece(this.boardState, this.move, indexX, indexY);
-          this.app.renderer.render(this.app.stage); // check
-          // console.log("Check player move")
-          setTimeout(() => {
-            const boardStateCopy = this.copyBoardState(this.boardState);
-            // console.log(boardStateCopy)
-            this.setPost(boardStateCopy);
-            console.log(
-              this.minimax(
-                boardStateCopy,
-                100000,
-                -100000,
-                4,
-                4,
-                true
-              )
-            );
-            setTimeout(() => {
-              this.movePiece(
-                this.boardState,
-                this.moveAI?.start,
-                this.moveAI?.end.indexX || 0,
-                this.moveAI?.end.indexY || 0
-              );
-            }, 500);
-            this.app.renderer.render(this.app.stage); // check
-          }, 500);
-        }
-      }
-      this.boardState.forEach((row) => {
-        row.forEach((item) => {
-          if (item.focus) {
-            this.removeChild(item.focus);
-            item.focus = null;
-          }
-        });
-      });
 
-      this.move = undefined;
+                if (piece) {
+                    const listMovePiece = piece.move(
+                        this.boardState,
+                        indexX,
+                        indexY
+                    );
+                    this.moveValid = listMovePiece;
+                    // console.log(listMovePiece);
+
+                    listMovePiece.forEach((item) => {
+                        const indexX = item?.indexX;
+                        const indexY = item?.indexY;
+                        if (indexX != null && indexY != null) {
+                            const rect = new Graphics();
+                            rect.lineStyle(2, 0xff0000);
+                            rect.drawRect(
+                                this.boardState[indexX][indexY].post.x -
+                                    widthItem / 2,
+                                this.boardState[indexX][indexY].post.y -
+                                    widthItem / 2,
+                                widthItem,
+                                widthItem
+                            );
+                            this.boardState[indexX][indexY].focus = rect;
+                            this.addChild(rect);
+                        }
+                    });
+                }
+
+                this.move = { indexX: indexX, indexY: indexY };
+            }
+        } else {
+            if (
+                (indexX !== this.move?.indexX ||
+                    indexY !== this.move?.indexY) &&
+                this.move != undefined
+            ) {
+                // InputController.getInstance(0).removeMouseDownEvent();
+                const focus = this.boardState[indexX][indexY].focus;
+                if (focus) {
+                    this.movePiece(this.boardState, this.move, indexX, indexY);
+                    this.app.renderer.render(this.app.stage); // check
+                    // console.log("Check player move")
+                    setTimeout(() => {
+                        const boardStateCopy = this.copyBoardState(
+                            this.boardState
+                        );
+                        // console.log(boardStateCopy)
+                        this.setPost(boardStateCopy);
+                        console.log(
+                            this.minimax(
+                                boardStateCopy,
+                                100000,
+                                -100000,
+                                4,
+                                4,
+                                true
+                            )
+                        );
+                        setTimeout(() => {
+                            this.movePiece(
+                                this.boardState,
+                                this.moveAI?.start,
+                                this.moveAI?.end.indexX || 0,
+                                this.moveAI?.end.indexY || 0
+                            );
+                        }, 500);
+                        this.app.renderer.render(this.app.stage); // check
+                    }, 500);
+                }
+            }
+            this.boardState.forEach((row) => {
+                row.forEach((item) => {
+                    if (item.focus) {
+                        this.removeChild(item.focus);
+                        item.focus = null;
+                    }
+                });
+            });
+
+            this.move = undefined;
+        }
     }
-  }
 
     public movePiece(
         boardState: any,
@@ -831,10 +740,6 @@ export default class StateManager extends Container {
             console.log(1);
             return this.valueCal(boardState);
         }
-    if (depth == 0 || checkKingComputer == false || checkKingPlayer == false) {
-      console.log(1)
-      return this.valueCal(boardState);
-    }
 
         // turn computer
         if (turn) {
@@ -864,24 +769,6 @@ export default class StateManager extends Container {
                     mapMinimax[i].move.indexX,
                     mapMinimax[i].move.indexY
                 );
-    // turn computer
-    if (turn) {
-      for (let i: number = 0; i < computer.length; ++i) {
-        const indexX = Math.floor((computer[i].y - borderBoard) / widthItem);
-        const indexY = Math.floor((computer[i].x - borderBoard) / widthItem);
-        const validMove = computer[i].move(boardState, indexX, indexY);
-
-        for (let j: number = 0; j < validMove.length; ++j) {
-          const boardStateCopy = this.copyBoardState(boardState);
-          const playerCopy: Piece[] = [];
-          const computerCopy: Piece[] = [];
-          this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-          this.movePieceAI(
-            boardStateCopy,
-            { indexX: indexX, indexY: indexY },
-            validMove[j].indexX,
-            validMove[j].indexY
-          );
 
                 const scoreNew: number = this.minimax(
                     boardStateCopy,
@@ -937,30 +824,6 @@ export default class StateManager extends Container {
                         );
                     }
                 });
-            if (depth == selectDepth) {
-              this.moveAI = {
-                start: { indexX: indexX, indexY: indexY },
-                end: {
-                  indexX: validMove[j].indexX,
-                  indexY: validMove[j].indexY,
-                },
-              };
-            }
-          }
-          if (anpha <= beta) {
-            return anpha;
-          }
-          // console.log("computer, " + "score: " + score, "depth: " + depth);
-        }
-      }
-      return anpha;
-    } else {
-      for (let i: number = 0; i < player.length; ++i) {
-        const indexX = Math.floor((player[i].y - borderBoard) / widthItem);
-        const indexY = Math.floor((player[i].x - borderBoard) / widthItem);
-        if (indexX < 0 || indexY < 0)
-          console.log(player[i].y + " " + player[i].x);
-        const validMove = player[i].move(boardState, indexX, indexY);
 
                 for (let j: number = 0; j < validMove.length; ++j) {
                     const boardStateCopy = this.copyBoardState(boardState);
@@ -1148,25 +1011,6 @@ export default class StateManager extends Container {
             return beta;
         }
     }
-          const scoreNew: number = this.minimax(
-            boardStateCopy,
-            anpha,
-            beta,
-            depth - 1,
-            selectDepth,
-            true
-          );
-          beta = Math.max(beta, scoreNew);
-
-          if (anpha <= beta) {
-            return beta;
-          }
-          // console.log("player, " + "score: " + score, "depth: " + depth);
-        }
-      }
-      return beta;
-    }
-  }
 
     public parstLocateArray(
         postX: number,
