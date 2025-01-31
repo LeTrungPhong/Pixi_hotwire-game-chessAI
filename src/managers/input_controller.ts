@@ -1,7 +1,7 @@
 import { Application, Container } from "pixi.js";
 import PieceManager from "./piece_manager";
 import StateManager from "./state_manager";
-import { borderBoard, widthItem } from "../common";
+import { borderBoard, paddingVertical, paddingHorizontal, widthItem } from "../common";
 import { app } from "../index"
 
 export default class InputController extends Container {
@@ -19,8 +19,8 @@ export default class InputController extends Container {
         this.scaleScene = scaleScene;
         this.pieceManager = PieceManager.getInstance();
         this.stateManager = StateManager.getInstance();
-        this.handleMouseDown = this.handleMouseDown.bind(this);
-        this.addMouseDownEvent();
+        // this.handleMouseDown = this.handleMouseDown.bind(this);
+        // this.addMouseDownEvent();
     }
 
     public static getInstance(scaleScene: number): InputController {
@@ -41,9 +41,28 @@ export default class InputController extends Container {
     public load() {
         window.addEventListener('keydown', (e) => this.keys[e.key] = true);
         window.addEventListener('keyup', (e) => this.keys[e.key] = false);
-        // window.addEventListener('mousedown', (e) => {
-            
-        // });
+        window.addEventListener('mousedown', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            const rect = this.app.view.getBoundingClientRect();
+            const gameX = (mouseX - rect.left);
+            const gameY = (mouseY - rect.top);
+
+            const row = Math.floor((gameY - borderBoard - paddingVertical) / widthItem);
+            const column = Math.floor((gameX - borderBoard - paddingHorizontal) / widthItem);
+
+            if (row <= 7 && row >= 0 && column <= 7 && column >= 0) {
+                for (let i: number = 0; i < this.stateManager.boardState.length; ++i) {
+                    for (let j: number = 0; j < this.stateManager.boardState[i].length; ++j) {
+
+                    }
+                }
+                this.stateManager.updateFocus(row, column);
+            }
+
+            console.log(`Mouse down at: (${row}, ${column})`);
+        });
         window.addEventListener('mouseup', (e) => this.buttons[e.button] = false);
         window.addEventListener('mousemove', (e) => {
             e
@@ -58,8 +77,8 @@ export default class InputController extends Container {
         const gameX = (mouseX - rect.left);
         const gameY = (mouseY - rect.top);
 
-        const row = Math.floor((gameY - borderBoard) / widthItem);
-        const column = Math.floor((gameX - borderBoard) / widthItem);
+        const row = Math.floor((gameY - borderBoard - paddingVertical) / widthItem);
+        const column = Math.floor((gameX - borderBoard - paddingHorizontal) / widthItem);
 
         if (row <= 7 && row >= 0 && column <= 7 && column >= 0) {
             for (let i: number = 0; i < this.stateManager.boardState.length; ++i) {
