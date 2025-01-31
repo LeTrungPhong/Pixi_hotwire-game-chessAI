@@ -10,6 +10,7 @@ import Rook from "../models/rook_piece";
 // import PieceManager from "./piece_manager";
 import StateManager from "./state_manager";
 import InputController from "./input_controller";
+import SettingManager from "./setting_manager";
 
 export default class GameManager extends Container {
     /* 
@@ -105,61 +106,26 @@ export default class GameManager extends Container {
         stateManager.whiteKing = { indexX: 7, indexY: 4 }
         stateManager.blackKing = { indexX: 0, indexY: 4 }
 
-        // create pieceManager()
-        // const pieceManager = PieceManager.getInstance();
-        // pieceManager.addPiece(whiteKing);
-        // pieceManager.addPiece(whiteBishop_1);
-        // pieceManager.addPiece(whiteBishop_2);
-        // pieceManager.addPiece(whiteKnight_1);
-        // pieceManager.addPiece(whiteKnight_2);
-        // pieceManager.addPiece(whitePawn_1);
-        // pieceManager.addPiece(whitePawn_2);
-        // pieceManager.addPiece(whitePawn_3);
-        // pieceManager.addPiece(whitePawn_4);
-        // pieceManager.addPiece(whitePawn_5);
-        // pieceManager.addPiece(whitePawn_6);
-        // pieceManager.addPiece(whitePawn_7);
-        // pieceManager.addPiece(whitePawn_8);
-        // pieceManager.addPiece(whiteQueen);
-        // pieceManager.addPiece(whiteRook_1);
-        // pieceManager.addPiece(whiteRook_2);
-
-        // pieceManager.addPiece(blackKing);
-        // pieceManager.addPiece(blackBishop_1);
-        // pieceManager.addPiece(blackBishop_2);
-        // pieceManager.addPiece(blackKnight_1);
-        // pieceManager.addPiece(blackKnight_2);
-        // pieceManager.addPiece(blackPawn_1);
-        // pieceManager.addPiece(blackPawn_2);
-        // pieceManager.addPiece(blackPawn_3);
-        // pieceManager.addPiece(blackPawn_4);
-        // pieceManager.addPiece(blackPawn_5);
-        // pieceManager.addPiece(blackPawn_6);
-        // pieceManager.addPiece(blackPawn_7);
-        // pieceManager.addPiece(blackPawn_8);
-        // pieceManager.addPiece(blackQueen);
-        // pieceManager.addPiece(blackRook_1);
-        // pieceManager.addPiece(blackRook_2);
+        // create setting manager
+        const settingManager = SettingManager.getInstance();
+        const textureSetting = textures.find(assets => assets.name === 'setting');
+        if (textureSetting) {
+            settingManager.addTexture(textureSetting.name, textureSetting.src);
+        }
+        settingManager.listen();
+        
 
         // add to ui
         this.addChild(this.boardScene);
-        // this.addChild(pieceManager)
 
         const inputController = new InputController(this.scaleScene);
         inputController.load();
         this.addChild(inputController);
         this.addChild(stateManager);
+        this.addChild(settingManager);
     }
 
     public initialize() {
         this.scaleScene
     }
-
-    // public show() {
-    //     StateManager.getInstance().show();
-    // }
-
-    // public getPositiveMoveAt(X: number, Y: number) : { indexX: number; indexY: number; }[]{
-    //     return StateManager.getInstance().getPositiveMoveAt(X, Y);
-    // }
 }

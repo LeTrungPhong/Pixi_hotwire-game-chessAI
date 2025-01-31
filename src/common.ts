@@ -1,6 +1,12 @@
 const width = 400;
 const height = 400;
+export const paddingVertical = 100;
+export const paddingHorizontal = 200;
 export const widthItem = width / 8;
 export const widthBoard = width + width * 0.04 * 2;
 export const heightBoard = height + height * 0.04 * 2;
 export const borderBoard = width * 0.04;
+export const widthGame = widthBoard + paddingHorizontal * 2;
+export const heightGame = heightBoard + paddingVertical * 2;
+export const sizeButtonSetting = 40;
+export const paddingContent = 10;

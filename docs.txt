@@ -1,7 +1,7 @@
-. Container
-. Sprite
-. Graphics
-. Text
+. Container <P>
+. Sprite <P>
+. Graphics <P>
+. Text <P>
 . Bitmap Text
 . Filters
 . Particles
@@ -13,13 +13,13 @@
 . FederatedPointerEvent
 . Keyboard (KeyboardEvent)
 . Making custom events and the overall syntax
-. Collision detection
-. AABB
-. SAT
-. Sound
-. Preloading assets
-. Promises
+. Collision detection <P>
+. AABB <P>
+. SAT 
+. Sound ...
+. Preloading assets <P>
+. Promises ... 
 . Hierarchy
-. Texture
+. Texture ...
 . Events Systems (Event emiter3)
-. UI
+. UI ...
