@@ -27,6 +27,7 @@ export default class StateManager extends Container {
         time: number;
         check: boolean;
     }[] = [];
+    public booleanState: boolean = true;
 
     private pawnEvalWhite = [
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0,
@@ -146,22 +147,6 @@ export default class StateManager extends Container {
     ) {
         boardState.forEach((row) => {
             row.forEach((item) => {
-                // const circle = new Graphics();
-                // const centerX = item.post.x ;
-                // const centerY = item.post.y ;
-
-                // circle.beginFill(0xff0000);
-                // circle.lineStyle(1, 0x000000);
-                // circle.drawCircle(0, 0, 2);
-
-                // circle.endFill();
-
-                // // Đặt vị trí cho circle
-                // circle.x = centerX;
-                // circle.y = centerY;
-
-                // this.addChild(circle)
-
                 if (item && item.piece) {
                     item.piece.x = item.post.x;
                     item.piece.y = item.post.y;
@@ -178,16 +163,107 @@ export default class StateManager extends Container {
     }
 
     public updateFocus(indexX: number, indexY: number) {
-        if (
-            this.move == undefined &&
-            indexX >= 0 &&
-            indexX < this.boardState.length &&
-            indexY >= 0 &&
-            indexY < this.boardState[indexX]?.length &&
-            this.boardState[indexX]?.[indexY]?.piece != null
-        ) {
-            const piece = this.boardState[indexX][indexY].piece;
-            if (piece && piece.getValue() > 0) {
+        if (this.booleanState) {
+            if (
+                this.move == undefined &&
+                indexX >= 0 &&
+                indexX < this.boardState.length &&
+                indexY >= 0 &&
+                indexY < this.boardState[indexX]?.length &&
+                this.boardState[indexX]?.[indexY]?.piece != null
+            ) {
+                const piece = this.boardState[indexX][indexY].piece;
+                if (piece && piece.getValue() > 0) {
+                    this.boardState.forEach((row) => {
+                        row.forEach((item) => {
+                            if (item.focus) {
+                                this.removeChild(item.focus);
+                                item.focus = null;
+                            }
+                        });
+                    });
+                    const rect = new Graphics();
+                    rect.lineStyle(2, 0xff0000);
+                    rect.drawRect(
+                        this.boardState[indexX][indexY].post.x - widthItem / 2,
+                        this.boardState[indexX][indexY].post.y - widthItem / 2,
+                        widthItem,
+                        widthItem
+                    );
+                    this.boardState[indexX][indexY].focus = rect;
+                    this.addChild(rect);
+    
+                    if (piece) {
+                        const listMovePiece = piece.move(
+                            this.boardState,
+                            indexX,
+                            indexY
+                        );
+                        this.moveValid = listMovePiece;
+                        // console.log(listMovePiece);
+    
+                        listMovePiece.forEach((item) => {
+                            const indexX = item?.indexX;
+                            const indexY = item?.indexY;
+                            if (indexX != null && indexY != null) {
+                                const rect = new Graphics();
+                                rect.lineStyle(2, 0xff0000);
+                                rect.drawRect(
+                                    this.boardState[indexX][indexY].post.x -
+                                        widthItem / 2,
+                                    this.boardState[indexX][indexY].post.y -
+                                        widthItem / 2,
+                                    widthItem,
+                                    widthItem
+                                );
+                                this.boardState[indexX][indexY].focus = rect;
+                                this.addChild(rect);
+                            }
+                        });
+                    }
+    
+                    this.move = { indexX: indexX, indexY: indexY };
+                }
+            } else {
+                if (
+                    (indexX !== this.move?.indexX ||
+                        indexY !== this.move?.indexY) &&
+                    this.move != undefined
+                ) {
+                    // InputController.getInstance(0).removeMouseDownEvent();
+                    const focus = this.boardState[indexX][indexY].focus;
+                    if (focus) {
+                        this.movePiece(this.boardState, this.move, indexX, indexY);
+                        this.app.renderer.render(this.app.stage); // check
+                        // console.log("Check player move")
+                        setTimeout(() => {
+                            const boardStateCopy = this.copyBoardState(
+                                this.boardState
+                            );
+                            // console.log(boardStateCopy)
+                            this.setPost(boardStateCopy);
+                            console.log(
+                                this.minimax(
+                                    boardStateCopy,
+                                    100000,
+                                    -100000,
+                                    4,
+                                    4,
+                                    true
+                                )
+                            );
+                            setTimeout(() => {
+                                this.movePiece(
+                                    this.boardState,
+                                    this.moveAI?.start,
+                                    this.moveAI?.end.indexX || 0,
+                                    this.moveAI?.end.indexY || 0
+                                );
+                            }, 500);
+                            this.app.renderer.render(this.app.stage); // check
+                        }, 500);
+                    }
+                }
                 this.boardState.forEach((row) => {
                     row.forEach((item) => {
                         if (item.focus) {
@@ -196,98 +272,9 @@ export default class StateManager extends Container {
                         }
                     });
                 });
-                const rect = new Graphics();
-                rect.lineStyle(2, 0xff0000);
-                rect.drawRect(
-                    this.boardState[indexX][indexY].post.x - widthItem / 2,
-                    this.boardState[indexX][indexY].post.y - widthItem / 2,
-                    widthItem,
-                    widthItem
-                );
-                this.boardState[indexX][indexY].focus = rect;
-                this.addChild(rect);
-
-                if (piece) {
-                    const listMovePiece = piece.move(
-                        this.boardState,
-                        indexX,
-                        indexY
-                    );
-                    this.moveValid = listMovePiece;
-                    // console.log(listMovePiece);
-
-                    listMovePiece.forEach((item) => {
-                        const indexX = item?.indexX;
-                        const indexY = item?.indexY;
-                        if (indexX != null && indexY != null) {
-                            const rect = new Graphics();
-                            rect.lineStyle(2, 0xff0000);
-                            rect.drawRect(
-                                this.boardState[indexX][indexY].post.x -
-                                    widthItem / 2,
-                                this.boardState[indexX][indexY].post.y -
-                                    widthItem / 2,
-                                widthItem,
-                                widthItem
-                            );
-                            this.boardState[indexX][indexY].focus = rect;
-                            this.addChild(rect);
-                        }
-                    });
-                }
-
-                this.move = { indexX: indexX, indexY: indexY };
+    
+                this.move = undefined;
             }
-        } else {
-            if (
-                (indexX !== this.move?.indexX ||
-                    indexY !== this.move?.indexY) &&
-                this.move != undefined
-            ) {
-                // InputController.getInstance(0).removeMouseDownEvent();
-                const focus = this.boardState[indexX][indexY].focus;
-                if (focus) {
-                    this.movePiece(this.boardState, this.move, indexX, indexY);
-                    this.app.renderer.render(this.app.stage); // check
-                    // console.log("Check player move")
-                    setTimeout(() => {
-                        const boardStateCopy = this.copyBoardState(
-                            this.boardState
-                        );
-                        // console.log(boardStateCopy)
-                        this.setPost(boardStateCopy);
-                        console.log(
-                            this.minimax(
-                                boardStateCopy,
-                                100000,
-                                -100000,
-                                4,
-                                4,
-                                true
-                            )
-                        );
-                        setTimeout(() => {
-                            this.movePiece(
-                                this.boardState,
-                                this.moveAI?.start,
-                                this.moveAI?.end.indexX || 0,
-                                this.moveAI?.end.indexY || 0
-                            );
-                        }, 500);
-                        this.app.renderer.render(this.app.stage); // check
-                    }, 500);
-                }
-            }
-            this.boardState.forEach((row) => {
-                row.forEach((item) => {
-                    if (item.focus) {
-                        this.removeChild(item.focus);
-                        item.focus = null;
-                    }
-                });
-            });
-
-            this.move = undefined;
         }
     }
 
