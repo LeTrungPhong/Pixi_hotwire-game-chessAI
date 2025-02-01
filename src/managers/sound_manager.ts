@@ -24,6 +24,7 @@ export default class SoundManager {
         if (soundItem) {
             soundItem.play();
             soundItem.loop = true;
+            soundItem.volume = 0.5;
         }
     }
 
