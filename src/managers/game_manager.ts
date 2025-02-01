@@ -109,9 +109,13 @@ export default class GameManager extends Container {
         // create setting manager
         const settingManager = SettingManager.getInstance();
         const textureSetting = textures.find(assets => assets.name === 'setting');
-        if (textureSetting) {
-            settingManager.addTexture(textureSetting.name, textureSetting.src);
-        }
+        const textureCursor = textures.find(assets => assets.name === 'cursor-down');
+        const textureClose = textures.find(assets => assets.name === "close");
+        
+        textureSetting && settingManager.addTexture(textureSetting.name, textureSetting.src);
+        textureCursor && settingManager.addTexture(textureCursor.name, textureCursor.src);
+        textureClose && settingManager.addTexture(textureClose.name, textureClose.src);
+        
         settingManager.listen();
         
 

@@ -39,6 +39,8 @@ const assets = [
     { name: "black-king", path: "assets/images/black-king.png" },
     { name: "black-bishop", path: "assets/images/black-bishop.png" },
     { name: "setting", path: "assets/images/setting.png" },
+    { name: "cursor-down", path: "assets/images/cursor-down.png" },
+    { name: "close", path: "assets/images/close.png" }
 ];
 
 const assetsSound = [
