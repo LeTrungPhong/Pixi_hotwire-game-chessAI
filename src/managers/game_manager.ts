@@ -111,10 +111,18 @@ export default class GameManager extends Container {
         const textureSetting = textures.find(assets => assets.name === 'setting');
         const textureCursor = textures.find(assets => assets.name === 'cursor-down');
         const textureClose = textures.find(assets => assets.name === "close");
+        const textureNext = textures.find(assets => assets.name === "next");
+        const textureBack = textures.find(assets => assets.name === "back");
+        const texturePause = textures.find(assets => assets.name === "pause");
+        const texturePlay = textures.find(assets => assets.name === "play");
         
         textureSetting && settingManager.addTexture(textureSetting.name, textureSetting.src);
         textureCursor && settingManager.addTexture(textureCursor.name, textureCursor.src);
         textureClose && settingManager.addTexture(textureClose.name, textureClose.src);
+        textureNext && settingManager.addTexture(textureNext.name, textureNext.src);
+        textureBack && settingManager.addTexture(textureBack.name, textureBack.src);
+        texturePause && settingManager.addTexture(texturePause.name, texturePause.src);
+        texturePlay && settingManager.addTexture(texturePlay.name, texturePlay.src);
         
         settingManager.listen();
         

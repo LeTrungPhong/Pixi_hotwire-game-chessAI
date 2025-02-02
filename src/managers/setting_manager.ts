@@ -34,6 +34,15 @@ export default class SettingManager extends Container {
     private textCursorDown: Text = new Text();
     private close: Sprite = new Sprite();
 
+    // music
+    private backButton: Sprite = new Sprite();
+    private nextButton: Sprite = new Sprite();
+    private pauseButton: Sprite = new Sprite();
+    private playButton: Sprite = new Sprite();
+    private textMusic: Text = new Text();
+    private line1: number = 50;
+    private space1: number = 30;
+
     constructor() {
         super();
 
@@ -47,7 +56,7 @@ export default class SettingManager extends Container {
         this.postY = 0 - paddingVertical + heightGame / 2;
         this.ui.drawRoundedRect(0 - paddingHorizontal + widthGame / 2 - this.widthUI / 2, 0 - paddingVertical + heightGame / 2 - this.heightUI / 2, this.widthUI, this.heightUI, 10); 
         this.ui.endFill(); 
-        // this.addChild(this.ui);
+        this.addChild(this.ui);
 
         const heigthLineVolume = 10;
         this.lengthVolume = this.widthUI / 2;
@@ -76,7 +85,20 @@ export default class SettingManager extends Container {
         this.textCursorDown.anchor.set(0.5);
         this.ui.addChild(this.textCursorDown);
 
-        
+        SoundManager.getInstance().playLoopSound(0.5);
+
+        const styly1: TextStyle = new TextStyle({
+            align: "center",
+            fill: "#ffffff",
+            fontSize: 15
+        });
+
+        this.textMusic.style = styly1;
+        this.textMusic.anchor.set(1, 0.5);
+        this.textMusic.x = this.postX + this.space1 * 5;
+        this.textMusic.y = this.postY - this.line1;
+        this.textMusic.text = SoundManager.getInstance().getNameMusic();
+        this.ui.addChild(this.textMusic);
     }
 
     public update(deltaTime: number) {
@@ -97,18 +119,6 @@ export default class SettingManager extends Container {
     }
 
     public listen() {
-
-        // this.ui.interactive = true;
-        // this.ui.on('pointerup', () => {
-        //     this.booleanOverLineNow = false;
-        //     // this.ui.cursor = 'default';
-        // })
-
-        // this.ui.on('mousemove', (e) => {
-            
-        // })
-
-
         this.buttonSetting.interactive = true;
         this.buttonSetting.on('pointerover', () => {
             this.checkButtonRotate = true;
@@ -164,8 +174,6 @@ export default class SettingManager extends Container {
                 this.app.renderer.view.style.cursor = "default";
             }
         })
-
-
         
         window.addEventListener('pointerup', () => {
             this.app.renderer.view.style.cursor = "default";
@@ -191,6 +199,44 @@ export default class SettingManager extends Container {
         this.close.on('pointerdown', () => {
             this.removeChild(this.ui);
         })
+
+        this.nextButton.interactive = true;
+        this.nextButton.on('pointerover', () => {
+            this.nextButton.cursor = 'pointer';
+        })
+        this.nextButton.on('pointerdown', () => {
+            SoundManager.getInstance().nextLoopSound(this.lengthNow / this.lengthVolume);
+            this.textMusic.text = SoundManager.getInstance().getNameMusic();
+        })
+
+        this.backButton.interactive = true;
+        this.backButton.on('pointerover', () => {
+            this.backButton.cursor = 'pointer';
+        })
+        this.backButton.on('pointerdown', () => {
+            SoundManager.getInstance().backLoopSound(this.lengthNow / this.lengthVolume);
+            this.textMusic.text = SoundManager.getInstance().getNameMusic();
+        })
+
+        this.pauseButton.interactive = true;
+        this.pauseButton.on('pointerover', () => {
+            this.pauseButton.cursor = 'pointer';
+        })
+        this.pauseButton.on('pointerdown', () => {
+            SoundManager.getInstance().pauseLoopSound();
+            this.ui.removeChild(this.pauseButton);
+            this.ui.addChild(this.playButton);
+        })
+
+        this.playButton.interactive = true;
+        this.playButton.on('pointerover', () => {
+            this.playButton.cursor = 'pointer';
+        })
+        this.playButton.on('pointerdown', () => {
+            SoundManager.getInstance().replayLoopSound();
+            this.ui.removeChild(this.playButton);
+            this.ui.addChild(this.pauseButton);
+        })
     }
 
     public setVolume(localPos: any) {
@@ -200,7 +246,7 @@ export default class SettingManager extends Container {
         } else if (length > 1) {
             length = 1;
         }
-        SoundManager.getInstance().volume('breezy', length);
+        SoundManager.getInstance().volume(length);
         // this.textCursorDown.text = `${length}`;
         this.lengthNow = localPos.x - this.postX;
         this.lineNow.x = this.lengthNow - this.lengthVolume / 2 - this.lineNow.width / 2 + this.widthLineNow / 2;
@@ -262,6 +308,42 @@ export default class SettingManager extends Container {
                 this.close.x = 0 - paddingHorizontal + widthGame / 2 - (this.widthUI / 2) + this.widthUI - this.close.width;
                 this.close.y = 0 - paddingVertical + heightGame / 2 - (this.heightUI / 2) + this.close.height;
                 this.ui.addChild(this.close);
+                break;
+            case 'next':
+                this.nextButton = Sprite.from(texture);
+                this.nextButton.width = 30;
+                this.nextButton.height = 30;
+                this.nextButton.x = this.postX + this.space1 * 2;
+                this.nextButton.y = this.postY - this.line1;
+                this.nextButton.anchor.set(0.5, 0.5);
+                this.ui.addChild(this.nextButton);
+                break;
+            case 'back':
+                this.backButton = Sprite.from(texture);
+                this.backButton.width = 30;
+                this.backButton.height = 30;
+                this.backButton.x = this.postX;
+                this.backButton.y = this.postY - this.line1;
+                this.backButton.anchor.set(0.5, 0.5);
+                this.ui.addChild(this.backButton);
+                break;
+            case 'pause':
+                this.pauseButton = Sprite.from(texture);
+                this.pauseButton.width = 30;
+                this.pauseButton.height = 30;
+                this.pauseButton.x = this.postX + this.space1;
+                this.pauseButton.y = this.postY - this.line1;
+                this.pauseButton.anchor.set(0.5, 0.5);
+                this.ui.addChild(this.pauseButton);
+                break;
+            case 'play':
+                this.playButton = Sprite.from(texture);
+                this.playButton.width = 30;
+                this.playButton.height = 30;
+                this.playButton.x = this.postX + this.space1;
+                this.playButton.y = this.postY - this.line1;
+                this.playButton.anchor.set(0.5, 0.5);
+                // this.ui.addChild(this.playButton);
                 break;
             default: 
                 break;

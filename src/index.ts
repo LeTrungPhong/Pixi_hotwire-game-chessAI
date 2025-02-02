@@ -1,6 +1,11 @@
 import { Application, Assets } from "pixi.js";
 import GameManager from "./managers/game_manager";
-import { heightGame, paddingVertical, paddingHorizontal, widthGame } from "./common";
+import {
+    heightGame,
+    paddingVertical,
+    paddingHorizontal,
+    widthGame,
+} from "./common";
 import StateManager from "./managers/state_manager";
 import { sound } from "@pixi/sound";
 import SoundManager from "./managers/sound_manager";
@@ -40,15 +45,19 @@ const assets = [
     { name: "black-bishop", path: "assets/images/black-bishop.png" },
     { name: "setting", path: "assets/images/setting.png" },
     { name: "cursor-down", path: "assets/images/cursor-down.png" },
-    { name: "close", path: "assets/images/close.png" }
+    { name: "close", path: "assets/images/close.png" },
+    { name: "next", path: "assets/images/next.png" },
+    { name: "back", path: "assets/images/back.png" },
+    { name: "pause", path: "assets/images/pause.png" },
+    { name: "play", path: "assets/images/play.png" }
 ];
 
 const assetsSound = [
-    { name: "breezy", path: "assets/sounds/breezy.mp3" },
-    { name: "dream", path: "assets/sounds/dream.mp3" },
-    { name: "lazy", path: "assets/sounds/lazy.mp3" },
-    { name: "morning", path: "assets/sounds/morning.mp3" },
-    { name: "peace", path: "assets/sounds/peace.mp3" },
+    { name: "breezy", path: "assets/sounds/breezy.mp3", type: "music" },
+    { name: "dream", path: "assets/sounds/dream.mp3", type: "music" },
+    { name: "lazy", path: "assets/sounds/lazy.mp3", type: "music" },
+    { name: "morning", path: "assets/sounds/morning.mp3", type: "music" },
+    { name: "peace", path: "assets/sounds/peace.mp3", type: "music" },
 ];
 
 async function loadAssets() {
@@ -65,12 +74,15 @@ async function loadAssets() {
 
         // Tai nhac
         await Promise.all(
-            assetsSound.map((item) => 
-                sound.add(item.name, item.path)
-            )
-        )
+            assetsSound.map((item) => {
+                sound.add(item.name, item.path);
+                if (item.type === "music") {
+                    SoundManager.getInstance().addMusic(item.name);
+                }
+            })
+        );
 
-        SoundManager.getInstance().playLoopSound('breezy');
+        // SoundManager.getInstance().playLoopSound("breezy");
 
         app.renderer.resize(widthGame, heightGame);
         app.stage.position.set(paddingHorizontal, paddingVertical);
