@@ -49,7 +49,10 @@ const assets = [
     { name: "next", path: "assets/images/next.png" },
     { name: "back", path: "assets/images/back.png" },
     { name: "pause", path: "assets/images/pause.png" },
-    { name: "play", path: "assets/images/play.png" }
+    { name: "play", path: "assets/images/play.png" },
+    { name: "home", path: "assets/images/home.png" },
+    { name: "reset", path: "assets/images/reset.png" },
+    { name: "move_back", path: "assets/images/move_back.png" },
 ];
 
 const assetsSound = [
