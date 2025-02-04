@@ -3,7 +3,9 @@ import { sound } from "@pixi/sound";
 export default class SoundManager {
     private static instance: SoundManager;
     private listMusic: string[] = [];
+    private moveSound?: string;
     private index: number = 0;
+    private volumeGame: number = 0.5;
 
     constructor() {
 
@@ -21,8 +23,28 @@ export default class SoundManager {
         this.listMusic.push(name);
     }
 
+    public addMoveSound(name: string) {
+        this.moveSound = name;
+    }
+
+    public setVolumeMove(volume: number) {
+        this.volumeGame = volume;
+    }
+
+    public playMoveSound() {
+        const itemMoveSound = this.moveSound ? sound.find(this.moveSound) : null;
+        if (itemMoveSound) {
+            itemMoveSound.play();
+            itemMoveSound.volume = this.volumeGame;
+        }
+    }
+
     public playSound(name: string) {
-        sound.play(name);
+        const item = sound.find(name);
+        if (item) {
+            item.play();
+            item.volume = this.volumeGame;
+        }
     }
 
     public getNameMusic(): string {
