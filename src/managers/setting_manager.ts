@@ -3,6 +3,7 @@ import { paddingVertical, paddingHorizontal, paddingContent, sizeButtonSetting, 
 import StateManager from "./state_manager";
 import SoundManager from "./sound_manager";
 import { app } from "..";
+import Volume from "./volume";
 
 export default class SettingManager extends Container {
     private static instance: SettingManager;
@@ -42,6 +43,17 @@ export default class SettingManager extends Container {
     private textMusic: Text = new Text();
     private line1: number = 50;
     private space1: number = 30;
+
+    // volume game
+
+    // text
+    private paddingRight = 130;
+    private textTitleVolume: Text = new Text();
+    private textTitleMusic: Text = new Text();
+    private textTitleVolumeGame: Text = new Text();
+    private textTitleLanguage: Text = new Text();
+
+    private volumeGame?: Volume;
 
     constructor() {
         super();
@@ -89,16 +101,55 @@ export default class SettingManager extends Container {
 
         const styly1: TextStyle = new TextStyle({
             align: "center",
-            fill: "#ffffff",
+            fill: "#DDDDDD",
             fontSize: 15
         });
 
         this.textMusic.style = styly1;
-        this.textMusic.anchor.set(1, 0.5);
-        this.textMusic.x = this.postX + this.space1 * 5;
+        this.textMusic.anchor.set(0, 0.5);
+        this.textMusic.x = this.postX + this.space1 * 4;
         this.textMusic.y = this.postY - this.line1;
-        this.textMusic.text = SoundManager.getInstance().getNameMusic();
+        this.textMusic.text = SoundManager.getInstance().getNameMusic() + " - audio";
         this.ui.addChild(this.textMusic);
+
+        // text
+        const styly2: TextStyle = new TextStyle({
+            align: "center",
+            fill: "#C0C0C0",
+            fontSize: 15
+        });
+
+        this.textTitleVolume.style = styly2;
+        this.textTitleVolume.text = 'Volume music'
+        this.textTitleVolume.anchor.set(0, 0.5);
+        this.textTitleVolume.x = this.postX - this.paddingRight;
+        this.textTitleVolume.y = this.postY;
+        this.ui.addChild(this.textTitleVolume);
+
+        this.textTitleMusic.style = styly2;
+        this.textTitleMusic.text = 'Change music'
+        this.textTitleMusic.anchor.set(0, 0.75);
+        this.textTitleMusic.x = this.postX - this.paddingRight;
+        this.textTitleMusic.y = this.postY - this.space1 - 15;
+        this.ui.addChild(this.textTitleMusic);
+
+        this.textTitleVolumeGame.style = styly2;
+        this.textTitleVolumeGame.text = 'Volume game'
+        this.textTitleVolumeGame.anchor.set(0, 0.25);
+        this.textTitleVolumeGame.x = this.postX - this.paddingRight;
+        this.textTitleVolumeGame.y = this.postY + this.space1 + 15;
+        this.ui.addChild(this.textTitleVolumeGame);
+
+        this.textTitleLanguage.style = styly2;
+        this.textTitleLanguage.text = 'Language'
+        this.textTitleLanguage.anchor.set(0, 0);
+        this.textTitleLanguage.x = this.postX - this.paddingRight;
+        this.textTitleLanguage.y = this.postY + this.space1 * 2 + 30;
+        this.ui.addChild(this.textTitleLanguage);
+
+        this.volumeGame = new Volume(this.widthUI, this.heightUI);
+        this.ui.addChild(this.volumeGame);
+        this.volumeGame.listen();
     }
 
     public update(deltaTime: number) {
@@ -207,6 +258,7 @@ export default class SettingManager extends Container {
         this.nextButton.on('pointerdown', () => {
             SoundManager.getInstance().nextLoopSound(this.lengthNow / this.lengthVolume);
             this.textMusic.text = SoundManager.getInstance().getNameMusic();
+            SoundManager.getInstance().replayLoopSound();
         })
 
         this.backButton.interactive = true;
@@ -216,6 +268,7 @@ export default class SettingManager extends Container {
         this.backButton.on('pointerdown', () => {
             SoundManager.getInstance().backLoopSound(this.lengthNow / this.lengthVolume);
             this.textMusic.text = SoundManager.getInstance().getNameMusic();
+            SoundManager.getInstance().replayLoopSound();
         })
 
         this.pauseButton.interactive = true;
@@ -250,6 +303,12 @@ export default class SettingManager extends Container {
         // this.textCursorDown.text = `${length}`;
         this.lengthNow = localPos.x - this.postX;
         this.lineNow.x = this.lengthNow - this.lengthVolume / 2 - this.lineNow.width / 2 + this.widthLineNow / 2;
+    }
+
+    public setVolumeType(name: string, volume: number) {
+        if (name === "game") {
+            SoundManager.getInstance().setVolumeMove(volume);
+        }
     }
 
     public moveVolume(localPos: any) {
@@ -299,6 +358,7 @@ export default class SettingManager extends Container {
                 this.cursorDown.width = 30;
                 this.cursorDown.height = 30;
                 this.textCursorDown.y = this.postY - this.cursorDown.height - 6;
+                this.volumeGame?.spriteCursonDown(texture);
                 break;
             case 'close':
                 this.close = Sprite.from(texture);
@@ -313,7 +373,7 @@ export default class SettingManager extends Container {
                 this.nextButton = Sprite.from(texture);
                 this.nextButton.width = 30;
                 this.nextButton.height = 30;
-                this.nextButton.x = this.postX + this.space1 * 2;
+                this.nextButton.x = this.postX + this.space1 * 2 + this.nextButton.width / 2;
                 this.nextButton.y = this.postY - this.line1;
                 this.nextButton.anchor.set(0.5, 0.5);
                 this.ui.addChild(this.nextButton);
@@ -322,7 +382,7 @@ export default class SettingManager extends Container {
                 this.backButton = Sprite.from(texture);
                 this.backButton.width = 30;
                 this.backButton.height = 30;
-                this.backButton.x = this.postX;
+                this.backButton.x = this.postX + this.backButton.width / 2;
                 this.backButton.y = this.postY - this.line1;
                 this.backButton.anchor.set(0.5, 0.5);
                 this.ui.addChild(this.backButton);
@@ -331,7 +391,7 @@ export default class SettingManager extends Container {
                 this.pauseButton = Sprite.from(texture);
                 this.pauseButton.width = 30;
                 this.pauseButton.height = 30;
-                this.pauseButton.x = this.postX + this.space1;
+                this.pauseButton.x = this.postX + this.space1 + this.pauseButton.width / 2;
                 this.pauseButton.y = this.postY - this.line1;
                 this.pauseButton.anchor.set(0.5, 0.5);
                 this.ui.addChild(this.pauseButton);
@@ -340,7 +400,7 @@ export default class SettingManager extends Container {
                 this.playButton = Sprite.from(texture);
                 this.playButton.width = 30;
                 this.playButton.height = 30;
-                this.playButton.x = this.postX + this.space1;
+                this.playButton.x = this.postX + this.space1 + this.playButton.width / 2; 
                 this.playButton.y = this.postY - this.line1;
                 this.playButton.anchor.set(0.5, 0.5);
                 // this.ui.addChild(this.playButton);

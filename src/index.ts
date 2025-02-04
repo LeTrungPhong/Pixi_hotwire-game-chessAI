@@ -58,6 +58,7 @@ const assetsSound = [
     { name: "lazy", path: "assets/sounds/lazy.mp3", type: "music" },
     { name: "morning", path: "assets/sounds/morning.mp3", type: "music" },
     { name: "peace", path: "assets/sounds/peace.mp3", type: "music" },
+    { name: "move", path: "assets/sounds/move_sound.mp3", type: "sound" }
 ];
 
 async function loadAssets() {
@@ -78,6 +79,8 @@ async function loadAssets() {
                 sound.add(item.name, item.path);
                 if (item.type === "music") {
                     SoundManager.getInstance().addMusic(item.name);
+                } else if (item.type === "sound") {
+                    SoundManager.getInstance().addMoveSound(item.name);
                 }
             })
         );

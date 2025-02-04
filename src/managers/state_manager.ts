@@ -2,6 +2,7 @@ import { Application, Container, Graphics } from "pixi.js";
 import { borderBoard, widthBoard, widthItem } from "../common";
 import Piece from "../models/piece_abstract";
 import { app } from "../index";
+import SoundManager from "./sound_manager";
 
 export default class StateManager extends Container {
     private static instance: StateManager;
@@ -428,7 +429,7 @@ export default class StateManager extends Container {
                 check: true,
             });
         }
-
+        SoundManager.getInstance().playMoveSound();
         piece.setMoved(true);
 
         // this.setPost(boardState);
