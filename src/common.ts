@@ -1,6 +1,6 @@
 const width = 400;
 const height = 400;
-export const paddingVertical = 100;
+export const paddingVertical = 50;
 export const paddingHorizontal = 200;
 export const widthItem = width / 8;
 export const widthBoard = width + width * 0.04 * 2;

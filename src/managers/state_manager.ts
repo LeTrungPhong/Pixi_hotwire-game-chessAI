@@ -11,6 +11,7 @@ export default class StateManager extends Container {
         piece: Piece | null;
         focus: Graphics | null;
     }[][];
+    public moveBack: { start: { indexX: number; indexY: number }, end: { indexX: number, indexY: number }, piece: Piece | null }[] = [];
     private move?: { indexX: number; indexY: number };
     private moveAI?: {
         start: { indexX: number; indexY: number };
@@ -411,6 +412,7 @@ export default class StateManager extends Container {
             if (capturedPiece) {
                 this.removeChild(capturedPiece);
             }
+            this.moveBack.push({ start: { indexX: startX, indexY: startY }, end: { indexX: destX, indexY: destY }, piece: boardState[destX][destY].piece });
             boardState[startX][startY].piece = null;
             boardState[destX][destY].piece = piece;
 
@@ -450,6 +452,49 @@ export default class StateManager extends Container {
         }
         // Reset trạng thái nước đi
         this.move = undefined;
+    }
+
+    public back(number: number) {
+        if (this.moveBack && number > 0) {
+            const move = this.moveBack.pop();
+            if (move) {
+                const piece = this.boardState[move.end.indexX][move.end.indexY].piece;
+                if (piece) {
+                    this.boardState[move.start.indexX][move.start.indexY].piece = piece;
+                    this.boardState[move.end.indexX][move.end.indexY].piece = null;
+                    if (move.piece) {
+                        this.boardState[move.end.indexX][move.end.indexY].piece = move.piece;
+                    }
+                    this.interpolation.push({
+                        piece: piece,
+                        start: {
+                            x: this.boardState[move.end.indexX][move.end.indexY].post.x,
+                            y: this.boardState[move.end.indexX][move.end.indexY].post.y,
+                        },
+                        end: {
+                            x: this.boardState[move.start.indexX][move.start.indexY].post.x,
+                            y: this.boardState[move.start.indexX][move.start.indexY].post.y,
+                        },
+                        duration: 0.5,
+                        time: 0,
+                        check: true,
+                    });
+
+                    if (this.moveBack) {
+                        const moveLast = this.moveBack[this.moveBack.length - 1];
+                        if (moveLast) {
+                            const pieceLast = this.boardState[moveLast.end.indexX][moveLast.end.indexY].piece;
+                            if (pieceLast) {
+                                if (pieceLast.getValue() * piece.getValue() < 0) {
+                                    number--;
+                                }
+                                setTimeout(() => this.back(number), 500);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public movePieceAI(

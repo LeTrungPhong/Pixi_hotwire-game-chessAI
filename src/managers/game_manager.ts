@@ -1,6 +1,6 @@
-import { Container, Texture } from "pixi.js";
+import { Container, Graphics, Sprite, Texture } from "pixi.js";
 import BoardScene from "../scenes/board_scene";
-import { widthBoard } from "../common";
+import { borderBoard, heightGame, paddingHorizontal, paddingVertical, widthBoard, widthGame, widthItem } from "../common";
 import Knight from "../models/knight_piece";
 import King from "../models/king_piece";
 import Bishop from "../models/bishop_piece";
@@ -24,6 +24,9 @@ export default class GameManager extends Container {
     */
     private scaleScene: number;
     private boardScene: BoardScene;
+    private homeButton: Sprite = new Sprite();
+    private backButton: Sprite = new Sprite();
+    private resetButton: Sprite = new Sprite();
 
     constructor(textures: { name: string, src: Texture }[]) {
         super();
@@ -31,6 +34,13 @@ export default class GameManager extends Container {
         const textureBoard = textures.find(asset => asset.name === 'bouncing')?.src;
         this.scaleScene = widthBoard / (textureBoard?.width || 0);
         this.boardScene = new BoardScene(textureBoard);
+
+        const background = new Graphics();
+
+        background.beginFill(0xEEEEEE);
+        background.drawRect(-paddingHorizontal, -paddingVertical, widthGame, heightGame);
+        background.endFill();
+        this.addChild(background);
 
         const whiteKing = new King("white_king", 900, false, this.scaleScene, textures.find(assets => assets.name === 'white-king')?.src);
         const whiteBishop_1 = new Bishop("white_bishop", 45, false, this.scaleScene, textures.find(assets => assets.name === 'white-bishop')?.src);
@@ -123,9 +133,18 @@ export default class GameManager extends Container {
         textureBack && settingManager.addTexture(textureBack.name, textureBack.src);
         texturePause && settingManager.addTexture(texturePause.name, texturePause.src);
         texturePlay && settingManager.addTexture(texturePlay.name, texturePlay.src);
-        
+
         settingManager.listen();
-        
+
+        const textureHome = textures.find(assets => assets.name === 'home');
+        const textureMoveBack = textures.find(assets => assets.name === 'move_back');
+        const textureReset = textures.find(assets => assets.name === 'reset');
+
+        textureHome && this.addButton(textureHome.name, textureHome.src);
+        textureMoveBack && this.addButton(textureMoveBack.name, textureMoveBack.src);
+        textureReset && this.addButton(textureReset.name, textureReset.src);
+
+        this.listen();
 
         // add to ui
         this.addChild(this.boardScene);
@@ -139,5 +158,59 @@ export default class GameManager extends Container {
 
     public initialize() {
         this.scaleScene
+    }
+
+    public addButton(name: string, texture: Texture) {
+        switch(name) {
+            case 'home':
+                this.homeButton = Sprite.from(texture);
+                this.homeButton.anchor.set(0.5);
+                this.homeButton.width = 40;
+                this.homeButton.height = 40;
+                this.homeButton.x = borderBoard + widthItem / 2;
+                this.homeButton.y = -25;
+                this.addChild(this.homeButton);
+                break;
+            case 'move_back':
+                this.backButton = Sprite.from(texture);
+                this.backButton.anchor.set(0.5);
+                this.backButton.width = 40;
+                this.backButton.height = 40;
+                this.backButton.x = borderBoard + widthItem / 2 + widthItem;
+                this.backButton.y = -25;
+                this.addChild(this.backButton);
+                break;
+            case 'reset':
+                this.resetButton = Sprite.from(texture);
+                this.resetButton.anchor.set(0.5);
+                this.resetButton.width = 40;
+                this.resetButton.height = 40;
+                this.resetButton.x = borderBoard + widthItem / 2 + widthItem * 2;
+                this.resetButton.y = -25;
+                this.addChild(this.resetButton);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public listen() {
+        this.homeButton.interactive = true;
+        this.homeButton.on('pointerover', () => {
+            this.homeButton.cursor = 'pointer';
+        })
+
+        this.backButton.interactive = true;
+        this.backButton.on('pointerover', () => {
+            this.backButton.cursor = 'pointer';
+        })
+        this.backButton.on('pointerdown', () => {
+            StateManager.getInstance().back(2);
+        })
+
+        this.resetButton.interactive = true;
+        this.resetButton.on('pointerover', () => {
+            this.resetButton.cursor = 'pointer';
+        })
     }
 }

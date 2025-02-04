@@ -48,10 +48,12 @@ export default class SettingManager extends Container {
 
     // text
     private paddingRight = 130;
+    private textTitle: Text = new Text();
     private textTitleVolume: Text = new Text();
     private textTitleMusic: Text = new Text();
     private textTitleVolumeGame: Text = new Text();
     private textTitleLanguage: Text = new Text();
+    private textLanguage: Text = new Text();
 
     private volumeGame?: Volume;
 
@@ -97,7 +99,7 @@ export default class SettingManager extends Container {
         this.textCursorDown.anchor.set(0.5);
         this.ui.addChild(this.textCursorDown);
 
-        SoundManager.getInstance().playLoopSound(0.5);
+        SoundManager.getInstance().playLoopSound(0);
 
         const styly1: TextStyle = new TextStyle({
             align: "center",
@@ -146,6 +148,34 @@ export default class SettingManager extends Container {
         this.textTitleLanguage.x = this.postX - this.paddingRight;
         this.textTitleLanguage.y = this.postY + this.space1 * 2 + 30;
         this.ui.addChild(this.textTitleLanguage);
+
+        const styly3: TextStyle = new TextStyle({
+            align: "center",
+            fill: "#00FF00",
+            fontSize: 15,
+            fontWeight: "bold"
+        });
+
+        this.textLanguage.style = styly3;
+        this.textLanguage.text = "English";
+        this.textLanguage.anchor.set(0, 0);
+        this.textLanguage.x = this.postX;
+        this.textLanguage.y = this.postY + this.space1 * 2 + 30;
+        this.ui.addChild(this.textLanguage);
+
+        const styly4: TextStyle = new TextStyle({
+            align: "center",
+            fill: "#DDDDDD",
+            fontSize: 35,
+            fontWeight: "bold"
+        });
+
+        this.textTitle.text = "Setting Game";
+        this.textTitle.style = styly4;
+        this.textTitle.anchor.set(0.5, 0.5);
+        this.textTitle.x = this.postX + this.lengthNow - this.widthLineNow / 2;
+        this.textTitle.y = this.postY - this.heightUI / 2 + 50;
+        this.ui.addChild(this.textTitle);
 
         this.volumeGame = new Volume(this.widthUI, this.heightUI);
         this.ui.addChild(this.volumeGame);
