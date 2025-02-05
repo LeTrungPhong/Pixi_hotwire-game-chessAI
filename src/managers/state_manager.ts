@@ -30,6 +30,7 @@ export default class StateManager extends Container {
         check: boolean;
     }[] = [];
     public booleanState: boolean = true;
+    public level: number = 2;
 
     private pawnEvalWhite = [
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0,
@@ -101,6 +102,8 @@ export default class StateManager extends Container {
         this.bishopEvalBlack = this.reverseArray(this.bishopEvalWhite);
         this.rookEvalBlack = this.reverseArray(this.rookEvalWhite);
         this.kingEvalBlack = this.reverseArray(this.kingEvalWhite);
+
+        this.sortableChildren = true;
     }
 
     // func lay danh sách bên trắng, bên đen (turn) => quân cờ // trung
@@ -137,6 +140,7 @@ export default class StateManager extends Container {
 
     public addState(row: number, column: number, piece: Piece) {
         this.boardState[row][column].piece = piece;
+        piece.zIndex = 2;
         this.addChild(piece);
     }
 
@@ -164,6 +168,10 @@ export default class StateManager extends Container {
         return StateManager.instance;
     }
 
+    public setLevel(level: number) {
+        this.level = level;
+    }
+
     public updateFocus(indexX: number, indexY: number) {
         if (this.booleanState) {
             if (
@@ -185,13 +193,14 @@ export default class StateManager extends Container {
                         });
                     });
                     const rect = new Graphics();
-                    rect.lineStyle(2, 0xff0000);
+                    rect.beginFill(0xff0000, 0.4);
                     rect.drawRect(
                         this.boardState[indexX][indexY].post.x - widthItem / 2,
                         this.boardState[indexX][indexY].post.y - widthItem / 2,
                         widthItem,
                         widthItem
                     );
+                    rect.endFill();
                     this.boardState[indexX][indexY].focus = rect;
                     this.addChild(rect);
     
@@ -209,7 +218,7 @@ export default class StateManager extends Container {
                             const indexY = item?.indexY;
                             if (indexX != null && indexY != null) {
                                 const rect = new Graphics();
-                                rect.lineStyle(2, 0xff0000);
+                                rect.beginFill(0xff0000, 0.4);
                                 rect.drawRect(
                                     this.boardState[indexX][indexY].post.x -
                                         widthItem / 2,
@@ -218,6 +227,7 @@ export default class StateManager extends Container {
                                     widthItem,
                                     widthItem
                                 );
+                                rect.endFill();
                                 this.boardState[indexX][indexY].focus = rect;
                                 this.addChild(rect);
                             }
@@ -249,8 +259,8 @@ export default class StateManager extends Container {
                                     boardStateCopy,
                                     100000,
                                     -100000,
-                                    4,
-                                    4,
+                                    this.level,
+                                    this.level,
                                     true
                                 )
                             );
@@ -415,6 +425,7 @@ export default class StateManager extends Container {
             this.moveBack.push({ start: { indexX: startX, indexY: startY }, end: { indexX: destX, indexY: destY }, piece: boardState[destX][destY].piece });
             boardState[startX][startY].piece = null;
             boardState[destX][destY].piece = piece;
+            console.log(this.moveBack);
 
             this.interpolation.push({
                 piece: piece,
@@ -454,7 +465,7 @@ export default class StateManager extends Container {
         this.move = undefined;
     }
 
-    public back(number: number) {
+    public back(number: number, time: number) {
         if (this.moveBack && number > 0) {
             const move = this.moveBack.pop();
             if (move) {
@@ -464,6 +475,7 @@ export default class StateManager extends Container {
                     this.boardState[move.end.indexX][move.end.indexY].piece = null;
                     if (move.piece) {
                         this.boardState[move.end.indexX][move.end.indexY].piece = move.piece;
+                        this.addChild(move.piece);
                     }
                     this.interpolation.push({
                         piece: piece,
@@ -488,7 +500,7 @@ export default class StateManager extends Container {
                                 if (pieceLast.getValue() * piece.getValue() < 0) {
                                     number--;
                                 }
-                                setTimeout(() => this.back(number), 500);
+                                setTimeout(() => this.back(number, time), time + 200);
                             }
                         }
                     }

@@ -70,7 +70,7 @@ export default class SettingManager extends Container {
         this.postY = 0 - paddingVertical + heightGame / 2;
         this.ui.drawRoundedRect(0 - paddingHorizontal + widthGame / 2 - this.widthUI / 2, 0 - paddingVertical + heightGame / 2 - this.heightUI / 2, this.widthUI, this.heightUI, 10); 
         this.ui.endFill(); 
-        this.addChild(this.ui);
+        // this.addChild(this.ui);
 
         const heigthLineVolume = 10;
         this.lengthVolume = this.widthUI / 2;
@@ -99,7 +99,7 @@ export default class SettingManager extends Container {
         this.textCursorDown.anchor.set(0.5);
         this.ui.addChild(this.textCursorDown);
 
-        SoundManager.getInstance().playLoopSound(0);
+        SoundManager.getInstance().playLoopSound(0.5);
 
         const styly1: TextStyle = new TextStyle({
             align: "center",

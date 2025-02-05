@@ -1,4 +1,4 @@
-import { Container, Graphics, Sprite, Texture } from "pixi.js";
+import { Container, Graphics, Sprite, Texture, Text, TextStyle } from "pixi.js";
 import BoardScene from "../scenes/board_scene";
 import { borderBoard, heightGame, paddingHorizontal, paddingVertical, widthBoard, widthGame, widthItem } from "../common";
 import Knight from "../models/knight_piece";
@@ -22,11 +22,24 @@ export default class GameManager extends Container {
             QUEEN: 90
             KING: 900
     */
+    
+    // game_ui
+    private gameUI: Container = new Container();
     private scaleScene: number;
     private boardScene: BoardScene;
     private homeButton: Sprite = new Sprite();
     private backButton: Sprite = new Sprite();
     private resetButton: Sprite = new Sprite();
+
+    // home_ui
+    private homeUI: Container = new Container();
+    private levelButton_1: Graphics = new Graphics();
+    private levelButton_2: Graphics = new Graphics();
+    private levelButton_3: Graphics = new Graphics();
+    private levelText_1: Text = new Text();
+    private levelText_2: Text = new Text();
+    private levelText_3: Text = new Text();
+    private titleGameText: Text = new Text();
 
     constructor(textures: { name: string, src: Texture }[]) {
         super();
@@ -118,6 +131,7 @@ export default class GameManager extends Container {
 
         // create setting manager
         const settingManager = SettingManager.getInstance();
+        settingManager.zIndex = 2;
         const textureSetting = textures.find(assets => assets.name === 'setting');
         const textureCursor = textures.find(assets => assets.name === 'cursor-down');
         const textureClose = textures.find(assets => assets.name === "close");
@@ -147,13 +161,82 @@ export default class GameManager extends Container {
         this.listen();
 
         // add to ui
-        this.addChild(this.boardScene);
+        this.gameUI.addChild(this.boardScene);
 
         const inputController = new InputController(this.scaleScene);
         inputController.load();
-        this.addChild(inputController);
-        this.addChild(stateManager);
+        this.gameUI.addChild(inputController);
+        this.gameUI.addChild(stateManager);
         this.addChild(settingManager);
+
+        const widthButtonLevel = 220;
+        const heightButtonLevel = 60;
+        const padding = 20;
+
+        const postButtonLevel_X = 0 - paddingHorizontal + widthGame / 2 - widthButtonLevel / 2;
+        const postButtonLevel_Y = 0 - paddingVertical + heightGame / 2 - heightButtonLevel / 2;
+
+        // home ui
+        this.levelButton_1.beginFill(0x000000, 0.5);
+        this.levelButton_1.drawRect(postButtonLevel_X, postButtonLevel_Y - heightButtonLevel - padding, widthButtonLevel, heightButtonLevel);
+        this.levelButton_1.endFill();
+
+        this.levelButton_2.beginFill(0x000000, 0.5);
+        this.levelButton_2.drawRect(postButtonLevel_X, postButtonLevel_Y, widthButtonLevel, heightButtonLevel);
+        this.levelButton_2.endFill();
+
+        this.levelButton_3.beginFill(0x000000, 0.5);
+        this.levelButton_3.drawRect(postButtonLevel_X, postButtonLevel_Y + heightButtonLevel + padding, widthButtonLevel, heightButtonLevel);
+        this.levelButton_3.endFill();
+
+        const styly: TextStyle = new TextStyle({
+            align: "center",
+            fill: "#DDDDDD",
+            fontSize: 25
+        });
+
+        this.levelText_1.style = styly;
+        this.levelText_1.text = "Level 1";
+        this.levelText_1.x = postButtonLevel_X + widthButtonLevel / 2;
+        this.levelText_1.y = postButtonLevel_Y + heightButtonLevel / 2 - heightButtonLevel - padding;
+        this.levelText_1.anchor.set(0.5);
+
+        this.levelText_2.style = styly;
+        this.levelText_2.text = "Level 2";
+        this.levelText_2.x = postButtonLevel_X + widthButtonLevel / 2;
+        this.levelText_2.y = postButtonLevel_Y + heightButtonLevel / 2;
+        this.levelText_2.anchor.set(0.5);
+
+        this.levelText_3.style = styly;
+        this.levelText_3.text = "Level 3";
+        this.levelText_3.x = postButtonLevel_X + widthButtonLevel / 2;
+        this.levelText_3.y = postButtonLevel_Y + heightButtonLevel / 2 + heightButtonLevel + padding;
+        this.levelText_3.anchor.set(0.5);
+
+        const styly1: TextStyle = new TextStyle({
+            align: "center",
+            fill: "#222222",
+            fontSize: 40,
+            fontWeight: "bold"
+        });
+
+        this.titleGameText.style = styly1;
+        this.titleGameText.text = "Chess Game";
+        this.titleGameText.x = postButtonLevel_X + widthButtonLevel / 2;
+        this.titleGameText.y = postButtonLevel_Y - heightButtonLevel * 2 - padding * 2;
+        this.titleGameText.anchor.set(0.5);
+
+        this.homeUI.addChild(this.levelButton_1);
+        this.homeUI.addChild(this.levelButton_2);
+        this.homeUI.addChild(this.levelButton_3);
+        this.homeUI.addChild(this.levelText_1);
+        this.homeUI.addChild(this.levelText_2);
+        this.homeUI.addChild(this.levelText_3);
+        this.homeUI.addChild(this.titleGameText);
+
+        this.addChild(this.homeUI);
+
+        this.sortableChildren = true;
     }
 
     public initialize() {
@@ -169,7 +252,7 @@ export default class GameManager extends Container {
                 this.homeButton.height = 40;
                 this.homeButton.x = borderBoard + widthItem / 2;
                 this.homeButton.y = -25;
-                this.addChild(this.homeButton);
+                this.gameUI.addChild(this.homeButton);
                 break;
             case 'move_back':
                 this.backButton = Sprite.from(texture);
@@ -178,7 +261,7 @@ export default class GameManager extends Container {
                 this.backButton.height = 40;
                 this.backButton.x = borderBoard + widthItem / 2 + widthItem;
                 this.backButton.y = -25;
-                this.addChild(this.backButton);
+                this.gameUI.addChild(this.backButton);
                 break;
             case 'reset':
                 this.resetButton = Sprite.from(texture);
@@ -187,7 +270,7 @@ export default class GameManager extends Container {
                 this.resetButton.height = 40;
                 this.resetButton.x = borderBoard + widthItem / 2 + widthItem * 2;
                 this.resetButton.y = -25;
-                this.addChild(this.resetButton);
+                this.gameUI.addChild(this.resetButton);
                 break;
             default:
                 break;
@@ -199,18 +282,55 @@ export default class GameManager extends Container {
         this.homeButton.on('pointerover', () => {
             this.homeButton.cursor = 'pointer';
         })
+        this.homeButton.on('pointerdown', () => {
+            this.removeChild(this.gameUI);
+            this.addChild(this.homeUI);
+        })
 
         this.backButton.interactive = true;
         this.backButton.on('pointerover', () => {
             this.backButton.cursor = 'pointer';
         })
         this.backButton.on('pointerdown', () => {
-            StateManager.getInstance().back(2);
+            StateManager.getInstance().back(2, 500);
         })
 
         this.resetButton.interactive = true;
         this.resetButton.on('pointerover', () => {
             this.resetButton.cursor = 'pointer';
         })
+        this.resetButton.on('pointerdown', () => {
+            StateManager.getInstance().back(1000, 200);
+        })
+
+        this.levelButton_1.interactive = true;
+        this.levelButton_1.on('pointerover', () => {
+            this.levelButton_1.cursor = 'pointer';
+        })
+        this.levelButton_1.on('pointerdown', () => {
+            this.playGame(2);
+        });
+
+        this.levelButton_2.interactive = true;
+        this.levelButton_2.on('pointerover', () => {
+            this.levelButton_2.cursor = 'pointer';
+        })
+        this.levelButton_2.on('pointerdown', () => {
+            this.playGame(3);
+        });
+
+        this.levelButton_3.interactive = true;
+        this.levelButton_3.on('pointerover', () => {
+            this.levelButton_3.cursor = 'pointer';
+        })
+        this.levelButton_3.on('pointerdown', () => {
+            this.playGame(4);
+        });
+    }
+
+    public playGame(level: number) {
+        StateManager.getInstance().setLevel(level);
+        this.addChild(this.gameUI);
+        this.removeChild(this.homeUI);
     }
 }
