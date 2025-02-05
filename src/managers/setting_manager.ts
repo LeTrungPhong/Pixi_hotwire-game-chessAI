@@ -99,7 +99,7 @@ export default class SettingManager extends Container {
         this.textCursorDown.anchor.set(0.5);
         this.ui.addChild(this.textCursorDown);
 
-        SoundManager.getInstance().playLoopSound(0.5);
+        SoundManager.getInstance().playLoopSound(0);
 
         const styly1: TextStyle = new TextStyle({
             align: "center",

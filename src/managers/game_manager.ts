@@ -316,7 +316,7 @@ export default class GameManager extends Container {
             this.levelButton_2.cursor = 'pointer';
         })
         this.levelButton_2.on('pointerdown', () => {
-            this.playGame(3);
+            this.playGame(4);
         });
 
         this.levelButton_3.interactive = true;
@@ -324,7 +324,7 @@ export default class GameManager extends Container {
             this.levelButton_3.cursor = 'pointer';
         })
         this.levelButton_3.on('pointerdown', () => {
-            this.playGame(4);
+            this.playGame(6);
         });
     }
 
