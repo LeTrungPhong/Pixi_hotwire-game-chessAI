@@ -11,7 +11,11 @@ export default class StateManager extends Container {
         piece: Piece | null;
         focus: Graphics | null;
     }[][];
-    public moveBack: { start: { indexX: number; indexY: number }, end: { indexX: number, indexY: number }, piece: Piece | null }[] = [];
+    public moveBack: {
+        start: { indexX: number; indexY: number };
+        end: { indexX: number; indexY: number };
+        piece: Piece | null;
+    }[] = [];
     private move?: { indexX: number; indexY: number };
     private moveAI?: {
         start: { indexX: number; indexY: number };
@@ -203,7 +207,7 @@ export default class StateManager extends Container {
                     rect.endFill();
                     this.boardState[indexX][indexY].focus = rect;
                     this.addChild(rect);
-    
+
                     if (piece) {
                         const listMovePiece = piece.move(
                             this.boardState,
@@ -212,7 +216,7 @@ export default class StateManager extends Container {
                         );
                         this.moveValid = listMovePiece;
                         // console.log(listMovePiece);
-    
+
                         listMovePiece.forEach((item) => {
                             const indexX = item?.indexX;
                             const indexY = item?.indexY;
@@ -233,7 +237,7 @@ export default class StateManager extends Container {
                             }
                         });
                     }
-    
+
                     this.move = { indexX: indexX, indexY: indexY };
                 }
             } else {
@@ -245,7 +249,12 @@ export default class StateManager extends Container {
                     // InputController.getInstance(0).removeMouseDownEvent();
                     const focus = this.boardState[indexX][indexY].focus;
                     if (focus) {
-                        this.movePiece(this.boardState, this.move, indexX, indexY);
+                        this.movePiece(
+                            this.boardState,
+                            this.move,
+                            indexX,
+                            indexY
+                        );
                         this.app.renderer.render(this.app.stage); // check
                         // console.log("Check player move")
                         setTimeout(() => {
@@ -284,7 +293,7 @@ export default class StateManager extends Container {
                         }
                     });
                 });
-    
+
                 this.move = undefined;
             }
         }
@@ -422,7 +431,11 @@ export default class StateManager extends Container {
             if (capturedPiece) {
                 this.removeChild(capturedPiece);
             }
-            this.moveBack.push({ start: { indexX: startX, indexY: startY }, end: { indexX: destX, indexY: destY }, piece: boardState[destX][destY].piece });
+            this.moveBack.push({
+                start: { indexX: startX, indexY: startY },
+                end: { indexX: destX, indexY: destY },
+                piece: boardState[destX][destY].piece,
+            });
             boardState[startX][startY].piece = null;
             boardState[destX][destY].piece = piece;
             console.log(this.moveBack);
@@ -469,23 +482,35 @@ export default class StateManager extends Container {
         if (this.moveBack && number > 0) {
             const move = this.moveBack.pop();
             if (move) {
-                const piece = this.boardState[move.end.indexX][move.end.indexY].piece;
+                const piece =
+                    this.boardState[move.end.indexX][move.end.indexY].piece;
                 if (piece) {
-                    this.boardState[move.start.indexX][move.start.indexY].piece = piece;
-                    this.boardState[move.end.indexX][move.end.indexY].piece = null;
+                    this.boardState[move.start.indexX][
+                        move.start.indexY
+                    ].piece = piece;
+                    this.boardState[move.end.indexX][move.end.indexY].piece =
+                        null;
                     if (move.piece) {
-                        this.boardState[move.end.indexX][move.end.indexY].piece = move.piece;
+                        this.boardState[move.end.indexX][
+                            move.end.indexY
+                        ].piece = move.piece;
                         this.addChild(move.piece);
                     }
                     this.interpolation.push({
                         piece: piece,
                         start: {
-                            x: this.boardState[move.end.indexX][move.end.indexY].post.x,
-                            y: this.boardState[move.end.indexX][move.end.indexY].post.y,
+                            x: this.boardState[move.end.indexX][move.end.indexY]
+                                .post.x,
+                            y: this.boardState[move.end.indexX][move.end.indexY]
+                                .post.y,
                         },
                         end: {
-                            x: this.boardState[move.start.indexX][move.start.indexY].post.x,
-                            y: this.boardState[move.start.indexX][move.start.indexY].post.y,
+                            x: this.boardState[move.start.indexX][
+                                move.start.indexY
+                            ].post.x,
+                            y: this.boardState[move.start.indexX][
+                                move.start.indexY
+                            ].post.y,
                         },
                         duration: 0.5,
                         time: 0,
@@ -493,14 +518,24 @@ export default class StateManager extends Container {
                     });
 
                     if (this.moveBack) {
-                        const moveLast = this.moveBack[this.moveBack.length - 1];
+                        const moveLast =
+                            this.moveBack[this.moveBack.length - 1];
                         if (moveLast) {
-                            const pieceLast = this.boardState[moveLast.end.indexX][moveLast.end.indexY].piece;
+                            const pieceLast =
+                                this.boardState[moveLast.end.indexX][
+                                    moveLast.end.indexY
+                                ].piece;
                             if (pieceLast) {
-                                if (pieceLast.getValue() * piece.getValue() < 0) {
+                                if (
+                                    pieceLast.getValue() * piece.getValue() <
+                                    0
+                                ) {
                                     number--;
                                 }
-                                setTimeout(() => this.back(number, time), time + 200);
+                                setTimeout(
+                                    () => this.back(number, time),
+                                    time + 200
+                                );
                             }
                         }
                     }
@@ -789,88 +824,20 @@ export default class StateManager extends Container {
         // turn computer
         if (turn) {
             const boardStateCopy = this.copyBoardState(boardState);
-            const mapMinimax = this.minimaxDepth2(
-                boardStateCopy,
-                100000,
-                -100000,
-                2,
-                2,
-                true
-            );
 
-            mapMinimax.sort((a: any, b: any) => a.score - b.score);
-
-            for (let i: number = 0; i < mapMinimax.length; ++i) {
-                const boardStateCopy = this.copyBoardState(boardState);
-                const playerCopy: Piece[] = [];
-                const computerCopy: Piece[] = [];
-                this.copyListPiece(boardStateCopy, computerCopy, playerCopy);
-                this.movePieceAI(
+            if (depth >= 2) {
+                const mapMinimax = this.minimaxDepth2(
                     boardStateCopy,
-                    {
-                        indexX: mapMinimax[i].post.indexX,
-                        indexY: mapMinimax[i].post.indexY,
-                    },
-                    mapMinimax[i].move.indexX,
-                    mapMinimax[i].move.indexY
+                    100000,
+                    -100000,
+                    2,
+                    2,
+                    true
                 );
 
-                const scoreNew: number = this.minimax(
-                    boardStateCopy,
-                    anpha,
-                    beta,
-                    depth - 1,
-                    selectDepth,
-                    false
-                );
-                if (anpha > scoreNew) {
-                    anpha = scoreNew;
+                mapMinimax.sort((a: any, b: any) => a.score - b.score);
 
-                    if (depth == selectDepth) {
-                        this.moveAI = {
-                            start: {
-                                indexX: mapMinimax[i].post.indexX,
-                                indexY: mapMinimax[i].post.indexY,
-                            },
-                            end: {
-                                indexX: mapMinimax[i].move.indexX,
-                                indexY: mapMinimax[i].move.indexY,
-                            },
-                        };
-                    }
-                }
-
-                if (anpha <= beta) {
-                    return anpha;
-                }
-            }
-            return anpha;
-        } else {
-            for (let i: number = 0; i < player.length; ++i) {
-                const indexX = Math.floor(
-                    (player[i].y - borderBoard) / widthItem
-                );
-                const indexY = Math.floor(
-                    (player[i].x - borderBoard) / widthItem
-                );
-                if (indexX < 0 || indexY < 0)
-                    console.log(player[i].y + " " + player[i].x);
-                const validMove = player[i].move(boardState, indexX, indexY);
-
-                validMove.forEach((item) => {
-                    if (
-                        item.indexX < 0 ||
-                        item.indexY < 0 ||
-                        item.indexX > 7 ||
-                        item.indexY > 7
-                    ) {
-                        console.log(
-                            "x: " + item.indexX + ", y: " + item.indexY
-                        );
-                    }
-                });
-
-                for (let j: number = 0; j < validMove.length; ++j) {
+                for (let i: number = 0; i < mapMinimax.length; ++i) {
                     const boardStateCopy = this.copyBoardState(boardState);
                     const playerCopy: Piece[] = [];
                     const computerCopy: Piece[] = [];
@@ -881,9 +848,87 @@ export default class StateManager extends Container {
                     );
                     this.movePieceAI(
                         boardStateCopy,
-                        { indexX: indexX, indexY: indexY },
-                        validMove[j].indexX,
-                        validMove[j].indexY
+                        {
+                            indexX: mapMinimax[i].post.indexX,
+                            indexY: mapMinimax[i].post.indexY,
+                        },
+                        mapMinimax[i].move.indexX,
+                        mapMinimax[i].move.indexY
+                    );
+
+                    const scoreNew: number = this.minimax(
+                        boardStateCopy,
+                        anpha,
+                        beta,
+                        depth - 1,
+                        selectDepth,
+                        false
+                    );
+                    if (anpha > scoreNew) {
+                        anpha = scoreNew;
+
+                        if (depth == selectDepth) {
+                            this.moveAI = {
+                                start: {
+                                    indexX: mapMinimax[i].post.indexX,
+                                    indexY: mapMinimax[i].post.indexY,
+                                },
+                                end: {
+                                    indexX: mapMinimax[i].move.indexX,
+                                    indexY: mapMinimax[i].move.indexY,
+                                },
+                            };
+                        }
+                    }
+
+                    if (anpha <= beta) {
+                        return anpha;
+                    }
+                }
+                return anpha;
+            } else {
+                console.log(1);
+                return this.minimaxDepth2(
+                    boardStateCopy,
+                    100000,
+                    -100000,
+                    1,
+                    1,
+                    true
+                );
+            }
+        } else {
+            const boardStateCopy = this.copyBoardState(boardState);
+
+            if (depth >= 2) {
+                const mapMinimax = this.minimaxDepth2(
+                    boardStateCopy,
+                    100000,
+                    -100000,
+                    2,
+                    2,
+                    false
+                );
+
+                mapMinimax.sort((a: any, b: any) => b.score - a.score);
+
+                for (let i: number = 0; i < mapMinimax.length; ++i) {
+                    const boardStateCopy = this.copyBoardState(boardState);
+                    const playerCopy: Piece[] = [];
+                    const computerCopy: Piece[] = [];
+                    this.copyListPiece(
+                        boardStateCopy,
+                        computerCopy,
+                        playerCopy
+                    );
+                    this.movePieceAI(
+                        boardStateCopy,
+                        {
+                            indexX: mapMinimax[i].post.indexX,
+                            indexY: mapMinimax[i].post.indexY,
+                        },
+                        mapMinimax[i].move.indexX,
+                        mapMinimax[i].move.indexY
                     );
 
                     const scoreNew: number = this.minimax(
@@ -903,8 +948,19 @@ export default class StateManager extends Container {
                         return beta;
                     }
                 }
+
+                return beta;
+            } else {
+                console.log(1);
+                return this.minimaxDepth2(
+                    boardStateCopy,
+                    100000,
+                    -100000,
+                    1,
+                    1,
+                    false
+                );
             }
-            return beta;
         }
     }
 
@@ -1009,6 +1065,10 @@ export default class StateManager extends Container {
                     if (anpha > scoreNew) {
                         anpha = scoreNew;
                     }
+
+                    if (anpha <= beta) {
+                        return anpha;
+                    }
                 }
             }
             if (depth == 2) {
@@ -1051,9 +1111,36 @@ export default class StateManager extends Container {
                         true
                     );
                     beta = Math.max(beta, scoreNew);
+
+                    if (depth == 2) {
+                        mapMinimax.push({
+                            score: scoreNew,
+                            piece: computer[i],
+                            post: {
+                                indexX,
+                                indexY,
+                            },
+                            move: {
+                                indexX: validMove[j].indexX,
+                                indexY: validMove[j].indexY,
+                            },
+                        });
+                    }
+
+                    if (beta < scoreNew) {
+                        beta = scoreNew;
+                    }
+
+                    if (anpha <= beta) {
+                        return beta;
+                    }
                 }
             }
-            return beta;
+            if (depth == 2) {
+                return mapMinimax;
+            } else {
+                return beta;
+            }
         }
     }
 
