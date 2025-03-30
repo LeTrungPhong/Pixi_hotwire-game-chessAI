@@ -91,6 +91,7 @@ export default class GameManager extends Container {
 
         // create stateManager()
         const stateManager = StateManager.getInstance();
+
         stateManager.addState(0, 0, blackRook_1);
         stateManager.addState(0, 1, blackKnight_1);
         stateManager.addState(0, 2, blackBishop_1);
@@ -124,6 +125,40 @@ export default class GameManager extends Container {
         stateManager.addState(7, 5, whiteBishop_2);
         stateManager.addState(7, 6, whiteKnight_2);
         stateManager.addState(7, 7, whiteRook_2);
+
+        // stateManager.addState(0, 2, blackRook_1);
+        // // stateManager.addState(0, 1, blackKnight_1);
+        // stateManager.addState(1, 1, blackBishop_1);
+        // stateManager.addState(1, 2, blackQueen);
+        // stateManager.addState(1, 5, blackKing);
+        // // stateManager.addState(0, 5, blackBishop_2);
+        // // stateManager.addState(0, 6, blackKnight_2);
+        // // stateManager.addState(0, 7, blackRook_2);
+        // stateManager.addState(1, 0, blackPawn_1);
+        // stateManager.addState(1, 7, blackPawn_2);
+        // stateManager.addState(2, 1, blackPawn_3);
+        // stateManager.addState(2, 6, blackPawn_4);
+        // stateManager.addState(3, 3, blackPawn_5);
+        // stateManager.addState(3, 4, blackPawn_6);
+        // // stateManager.addState(1, 6, blackPawn_7);
+        // // stateManager.addState(1, 7, blackPawn_8);
+
+        // stateManager.addState(6, 1, whitePawn_1);
+        // stateManager.addState(6, 5, whitePawn_2);
+        // stateManager.addState(6, 6, whitePawn_3);
+        // stateManager.addState(5, 0, whitePawn_4);
+        // stateManager.addState(2, 7, whitePawn_5);
+        // // stateManager.addState(6, 5, whitePawn_6);
+        // // stateManager.addState(6, 6, whitePawn_7);
+        // // stateManager.addState(6, 7, whitePawn_8);
+        // stateManager.addState(0, 4, whiteRook_1);
+        // // stateManager.addState(7, 1, whiteKnight_1);
+        // stateManager.addState(4, 0, whiteBishop_1);
+        // stateManager.addState(5, 2, whiteQueen);
+        // stateManager.addState(7, 4, whiteKing);
+        // // stateManager.addState(7, 5, whiteBishop_2);
+        // // stateManager.addState(7, 6, whiteKnight_2);
+        // // stateManager.addState(7, 7, whiteRook_2);
         stateManager.setPost(stateManager.boardState);
 
         stateManager.whiteKing = { indexX: 7, indexY: 4 }
@@ -308,7 +343,7 @@ export default class GameManager extends Container {
             this.levelButton_1.cursor = 'pointer';
         })
         this.levelButton_1.on('pointerdown', () => {
-            this.playGame(2);
+            this.playGame(4);
         });
 
         this.levelButton_2.interactive = true;
@@ -316,7 +351,7 @@ export default class GameManager extends Container {
             this.levelButton_2.cursor = 'pointer';
         })
         this.levelButton_2.on('pointerdown', () => {
-            this.playGame(4);
+            this.playGame(5);
         });
 
         this.levelButton_3.interactive = true;

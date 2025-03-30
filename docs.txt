@@ -1,8 +1,8 @@
-. Container <P>
-. Sprite <P>
-. Graphics <P>
-. Text <P>
-. Bitmap Text
+. Container <P> .
+. Sprite <P> .
+. Graphics <P> .
+. Text <P> .
+. Bitmap Text .
 . Filters
 . Particles
 . Context
@@ -18,7 +18,7 @@
 . SAT 
 . Sound ...
 . Preloading assets <P> ...
-. Promises ... 
+. Promises ...
 . Hierarchy
 . Texture ...
 . Events Systems (Event emiter3) ...

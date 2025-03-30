@@ -1110,7 +1110,7 @@ export default class StateManager extends Container {
                         selectDepth,
                         true
                     );
-                    beta = Math.max(beta, scoreNew);
+                    // beta = Math.max(beta, scoreNew);
 
                     if (depth == 2) {
                         mapMinimax.push({
